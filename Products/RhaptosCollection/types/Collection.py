@@ -1016,9 +1016,37 @@ class Collection(CollectionBase, CollaborationManager):
 
         self.setProcessStatus('working')
 
-        printtool = getToolByName(self,'rhaptos_print')
         portal = self.portal_url.getPortalObject()
+        printtool = getToolByName(portal,'rhaptos_print')
 
+        # Check what print style we're set to, create a dependency if alternate
+        # depends is a list of other depencies arising from other queue jobs
+        # that must have completed and created some result.  Each dependency is
+        # described by a tuple. The dependency tuple consists of the key of the
+        # job we're dependent on, a type that is used for determining if the
+        # dependency is fulfilled, a detail dictionary of any additional
+        # information needed to so determine, and an action to perform if the
+        # dependecy is not met. This may currently be one of 'fail',
+        # 'reenqueue', (possible future: 'enqueuedep' or 'freeze' )
+        # The deptype may be 'printtool' for other files stored via printtool,
+        # or 'url' for a file available from a url, or 'file' for a directly
+        # accessible file. in Either case, the depdetail provides the values
+        # needed to determine if the dependecy exists, and is new enough for
+        # the current job to use to build the pdf
+
+        
+        styles = printtool.getAlternateStyles()
+        mystyle = self.getParameters().get('printstyle','')
+
+        if mystyle:
+            depends = []
+            depkey = 'colcomplete_%s' % self.objectId
+            deptype = 'printtool'
+            depdetail = {'objectId':self.objectId, 'version':self.version, 'extension':'offline.zip', 'newer':DateTime()}
+            depaction = 'reenqueue' 
+
+            depends.append((depkey,deptype,depaction,depdetail))
+        
         host = printtool.getHost()
         if host.startswith('http://'):
             host = host[7:]
@@ -1042,6 +1070,9 @@ class Collection(CollectionBase, CollaborationManager):
                         "serverURL":serverURL,
                         "project_name":project_name,
                         "project_short_name":project_short_name}
+        if depends:
+            dictRequest['depends'] = depends
+
         script_location = 'SCRIPTSDIR' in os.environ and os.environ['SCRIPTSDIR'] or '.'
         qtool.add(key, dictRequest, "%s/create_collection_pdf.zctl" % script_location)
 
