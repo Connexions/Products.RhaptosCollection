@@ -1,0 +1,51 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five">
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="source_create"
+      class="Products.RhaptosCollection.browser.CollXML.ExportView"
+      template="collxml.pt"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="source_download"
+      class="Products.RhaptosCollection.browser.CollXML.Download"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="source"
+      class="Products.RhaptosCollection.browser.CollXML.PublishedSource"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="complete"
+      class="Products.RhaptosCollection.browser.Packages.CompleteZip"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="offline"
+      class="Products.RhaptosCollection.browser.Packages.OfflineZip"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="epub"
+      class="Products.RhaptosCollection.browser.Packages.EpubZip"
+      permission="zope2.View" />
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="latex"
+      class="Products.RhaptosCollection.browser.Packages.LatexFromPrint"
+      permission="zope2.View" />
+
+   <include package=".ajaxcomposer" />
+
+</configure>

@@ -1,0 +1,12 @@
+help = """The GenericSetup version does not move a new tab into its 
+correct position. This bug only affects existing sites. This script 
+fixes the position."""
+
+import transaction
+
+portal = app.plone
+
+type = portal.portal_types.Collection
+type.moveUpActions(selections=['9'])
+type.moveUpActions(selections=['8'])
+transaction.commit()

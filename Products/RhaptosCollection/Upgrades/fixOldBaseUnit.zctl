@@ -1,0 +1,46 @@
+from Products.Archetypes import BaseUnit
+BaseUnit.oldBaseUnit = BaseUnit.BaseUnit
+
+help = """This script helps you through the process of fixing oldBaseUnits.
+If you get a list of bad oldBaseUnits in abstract from an upgrade script,
+plug them into 'objs' in this script's source as a return-separated list, just as printed out.
+"""
+
+paths = """
+"""
+
+# cnx.org values:
+#paths = """
+#/plone/Members/aca/col10143
+#/plone/Members/terk/col10153
+#/plone/Members/chrisc/col10202
+#/plone/Members/ngk/col10206
+#/plone/Members/schniter/col10144
+#/plone/Members/dljones/col10078
+#/plone/Members/mitali/col10216
+#/plone/Members/swong/col10213
+#/plone/Members/nowak/col10203
+#/plone/Members/ngk/col10204
+#/plone/Members/aaz/col10134
+#/plone/Members/jjanovec/col10210
+#/plone/GroupWorkspaces/wg25/col10217
+#/plone/GroupWorkspaces/risa90/col10225
+#"""
+
+paths = paths.split()
+
+if not paths:
+    print
+    print help
+else:
+    print "Extracting data from the broken objects and re-creating..."
+    print
+    for path in paths:
+        print path
+        col = app.restrictedTraverse(path)
+        text = col.abstract()
+        del col.abstract
+        col.setAbstract(text)
+
+import transaction
+transaction.commit()

@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+
+  <head>
+    <title>Report on the collection/module files cached by the Print Tool</title>
+  </head>
+  <body>
+    <tal:comment tal:replace="nothing">
+        This template is used to display information about cached collection files.
+    </tal:comment>
+
+    <div tal:define="isModule      python:context.portal_type and context.portal_type == 'Module' or False;
+                     isCollection  python: not isModule;
+                     ptool         nocall:context/rhaptos_print">
+      <tal:collection
+          tal:condition='isCollection'
+          tal:define="oid         context/objectId;
+                      ver         context/version;">
+        <h1>Collection <span tal:replace="oid"/> version <span tal:replace="ver"/></h1>
+
+        <table border="1">
+
+            <tr>
+              <th>Type</th>
+              <th>Exists?</th>
+              <th>Date</th>
+              <th>Size</th>
+            </tr>
+
+            <tal:comment tal:replace="nothing">PDF</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'pdf');
+                            pdf_status python:exists and ptool.getStatus(oid,ver,'pdf') or None;
+                            locked     python:exists and pdf_status is not None and pdf_status == 'locked';">
+              <tal:cached tal:condition='exists'>
+                <td>PDF</td>
+                <td>yes<span tal:condition='locked'> and locked</span></td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'pdf')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'pdf').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>PDF</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">LaTeX zip</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'latex.zip');">
+              <tal:cached tal:condition='exists'>
+                <td>LaTeX zip</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'latex.zip')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'latex.zip').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>LaTeX zip</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">Complete zip</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'complete.zip');">
+              <tal:cached tal:condition='exists'>
+                <td>Complete zip</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'complete.zip')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'complete.zip').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>Complete zip</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">Offline zip</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'offline.zip');">
+              <tal:cached tal:condition='exists'>
+                <td>Offline zip</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'offline.zip')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'offline.zip').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>Offline zip</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">ePub</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'epub');">
+              <tal:cached tal:condition='exists'>
+                <td>ePub</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'epub')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'epub').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>ePub</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">XML</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'xml');">
+              <tal:cached tal:condition='exists'>
+                <td>Collxml</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'xml')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'xml').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>Collxml</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+        </table>
+      </tal:collection>
+
+
+      <tal:module
+          tal:condition='isModule'
+          tal:define="oid         context/objectId;
+                      ver         context/version;">
+        <h1>Module <span tal:replace="oid"/> version <span tal:replace="ver"/></h1>
+
+        <table border="1">
+
+            <tr>
+              <th>Type</th>
+              <th>Exists?</th>
+              <th>Date</th>
+              <th>Size</th>
+            </tr>
+
+            <tal:comment tal:replace="nothing">PDF</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'pdf');">
+              <tal:cached tal:condition='exists'>
+                <td>PDF</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'pdf')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'pdf').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>PDF</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">Export zip</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'zip');">
+              <tal:cached tal:condition='exists'>
+                <td>Export zip</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'zip')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'zip').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>LaTeX zip</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">Offline zip</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'offline.zip');">
+              <tal:cached tal:condition='exists'>
+                <td>Offline zip</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'offline.zip')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'offline.zip').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>Offline zip</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+
+            <tal:comment tal:replace="nothing">ePub</tal:comment>
+            <tr tal:define="exists     python:ptool.doesFileExist(oid,ver,'epub');">
+              <tal:cached tal:condition='exists'>
+                <td>ePub</td>
+                <td>yes</td>
+                <td tal:content="python:ptool.getModificationDate(oid,ver,'epub')">date</td>
+                <td tal:content="python:ptool.getFile(oid,ver,'epub').size()" align="right">date</td>
+              </tal:cached>
+              <tal:notcached tal:condition='not:exists'>
+                <td>ePub</td>
+                <td>no</td>
+                <td/>
+                <td/>
+              </tal:notcached>
+            </tr>
+        </table>
+      </tal:module>
+    </div>
+  </body>
+</html>

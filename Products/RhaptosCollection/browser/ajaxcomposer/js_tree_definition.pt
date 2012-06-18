@@ -1,0 +1,42 @@
+<tal:def define="sm modules/Products/PythonScripts/standard">
+
+<tal:norender condition="nothing">
+<metal:macro define-macro="recurse">
+    <tal:sub condition="python:item.portal_type == 'SubCollection'">
+    new SubCollection({ 
+        text: "<span tal:replace="structure python:sm.html_quote(item.Title())" />", 
+        nodeid: '<span tal:replace="item/getId" />',
+        version: '<span tal:replace="item/version" />',
+        children: [<tal:loop repeat="item item/objectValues"><metal:use use-macro="view/index/macros/recurse" /><tal:comma condition="python:not repeat['item'].end">,</tal:comma></tal:loop>]
+    })
+    </tal:sub>
+    <tal:module condition="python:item.portal_type == 'PublishedContentPointer'">
+    new Module({ 
+        text: "<span tal:replace="structure python:sm.html_quote(item.Title())" />", 
+        nodeid: '<span tal:replace="item/getId" />',
+        version: '<span tal:replace="item/version" />'
+    })
+    </tal:module>
+</metal:macro>
+</tal:norender>
+
+new Ext.tree.TreePanel({
+    useArrows: true,
+    autoScroll: true,
+    animate: true,
+    enableDD: true,
+    containerScroll: true,
+    ddScroll: true,
+    border: false,
+    rootVisible: false,
+        
+    root: new Collection({ 
+            text: "<span tal:replace="structure python:sm.html_quote(context.Title())" />", 
+            nodeurl: '<span tal:replace="context/absolute_url" />',
+            nodeid: '<span tal:replace="context/getId" />',
+            version: '<span tal:replace="context/version" />',
+            children: [<tal:loop repeat="item python:[o for o in context.objectValues() if o.portal_type in ('SubCollection','PublishedContentPointer')]"><metal:use use-macro="view/index/macros/recurse" /><tal:comma condition="python:not repeat['item'].end">,</tal:comma></tal:loop>]
+    })
+});
+
+</tal:def>

@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      metal:use-macro="container/main_template/macros/master"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+
+  <body>
+  <tal:comment replace="nothing">
+  Template used to display print confirmation before sending user to QOOP.  This page is expected to be displayed
+  in a popup window.  Styles are added to hide search box, links above search box, navigation tabs and crumb trail.
+  </tal:comment>
+    <style metal:fill-slot="css_slot" type="text/css">
+        #portal-siteactions {
+          display:none;
+        }
+        #portal-searchbox {
+          display:none;
+        }
+        #portal-globalnav {
+          display:none;
+        }
+        #portal-breadcrumbs {
+          display:none;
+        }
+    
+    </style>
+
+    <metal:block fill-slot="top_slot" tal:define="dummy python:request.set('disable_border', 1)" />
+    
+    <metal:left fill-slot="column_one_slot"></metal:left>
+  
+    <div metal:fill-slot="main"
+          tal:define="pfile context/getPrintedFile | nothing;
+                      currentPath python:context.absolute_url().split('/');
+                      printable python:pfile and pfile.get_size();
+                      version context/version | nothing;
+                      versionURL python:'/'.join(currentPath[:-1]+[version]);">
+      <div>
+        <img src="collection-print-cover.jpg" alt="generic print cover" align="left" height="206px" width="159px" style="padding: 6px 10px 6px 0px;" />
+      </div>
+      <div>
+        <h2><span tal:replace="here/getTitle">[module title]</span></h2>
+        
+        <p id="cnx_authorship" i18n:translate="text_content_header_authorship">
+          <span i18n:name="by_colon">
+            <span class="cnx_before" i18n:translate="text_by_header">
+              <span i18n:name="collection_type"
+                    tal:define="coll_type nocall:context/getCollectionType | nothing;
+                                modtype python:coll_type and (coll_type('short') or 'Collection') or 'Module'"
+                    tal:replace="modtype"/>
+              by:
+            </span>
+          </span>
+          <span i18n:name="authors"> 
+            <tal:person tal:repeat="p here/authors">
+              <tal:badauthor tal:on-error="string:(${p})">
+              <!-- i18n:FIXME need better localization of inline list separation -->
+              <a tal:define="p python:here.desecured.getMemberById(p)"
+                  tal:content="p/fullname"
+                  tal:attributes="href string:/member_profile/${p}">[fullname]</a></tal:badauthor><span tal:replace="string:, " tal:condition="not:repeat/p/end">[, ]</span>
+            </tal:person>
+          </span>
+          
+          <tal:optroles tal:repeat="role python:here.roles.items()" 
+            tal:define="opt_roles_dict here/portal_collaboration/optional_role_info">
+            <tal:FIXME tal:replace="nothing">
+              This is a really ugly condition that should not be set
+              here.  We need one of these three options to improve
+              this:
+              1. Write an API (probably on the Repository or
+              CollaborationTool) for telling which roles are displayed
+              where.
+              2. Use different page templates for Modules and Courses
+              (We'll probably have to add specific actions for modules
+              and courses that will use the correct template.
+              3. Figure out a standard interface that can be used to
+              both modules and courses without having special cases
+              for different roles for different objects.
+            </tal:FIXME>
+            <span class="cnx_optional_role" tal:condition="python:not(role[0]=='editors' and here.portal_type=='Module')">
+              <span i18n:translate="" tal:content="python:opt_roles_dict[role[0]][2]+':'" class="cnx_before">[Optional Role Name]</span>
+              <span tal:repeat="p python:role[1]">
+                
+                <tal:badauthor tal:on-error="string:(${p})">
+                  <tal:author tal:define="u python:here.desecured.getMemberById(p)">
+                    <a tal:content="u/fullname"
+                      tal:attributes="href string:/member_profile/${p}">[name]</a></tal:author></tal:badauthor><tal:comma tal:condition="not:repeat/p/end">, </tal:comma>
+              </span>
+            </span>
+          </tal:optroles>
+          
+        <span i18n:name="parent_authorship">
+            <span id="cnx_parent" tal:define="parent here/getParent | nothing" tal:condition="nocall:parent" i18n:translate="text_content_header_parent_authorship">
+              <span i18n:name="based_on_colon">
+                <span class="cnx_before" i18n:translate="text_based_on_header">Based on: </span>
+              </span>
+              <span i18n:name="parent_url">
+                <a tal:attributes="href parent/url" tal:content="parent/title">[content]</a>
+              </span>
+              by  
+              <span i18n:name="parent_authors">
+                <tal:person tal:repeat="p here/parentAuthors">
+                  <tal:badauthor tal:on-error="string:(${p})">
+                  <a tal:define="p python:here.desecured.getMemberById(p)"
+                    tal:content="p/fullname"
+                    tal:attributes="href string:/member_profile/${p}">[fullname]</a></tal:badauthor><span tal:replace="string:, " tal:condition="not:repeat/p/end">[, ]</span>
+                </tal:person> 
+              </span>
+            </span>
+          </span>
+        </p>
+      </div>
+      <h4>About Connexions Print-on-demand Books:</h4>
+      <p>
+      Thank you for requesting a copy of this Connexions Print On Demand Book. Connexions is part of an exciting new information distribution system 
+      that allows for Print on Demand Books by authors all over the world. This book's look and feel may not be the quality you 
+      are used to with a traditional typeset book. Some of the cost savings you experience are related to the quality of the look and feel of the book.
+      </p>
+      <p i18n:translate="text_printing_confirmation">
+        By continuing, you agree that you have reviewed the contents of the book and are satisfied with the contents of the book. CONNEXIONS/QOOP DOES NOT ALLOW FOR RETURNS, at this time.
+      </p>
+      <p>
+        <a href="pdf" title="Link to printer-friendly PDF format"
+                   tal:attributes="href string:$versionURL/pdf"
+                   i18n:translate="text_print">View Book (PDF)</a>
+      </p>
+      
+      <form action="." method="post" tal:attributes="action template/getId"
+            tal:define="errors options/state/getErrors">
+        <div class="field"
+             tal:define="error errors/agree | nothing;"
+             tal:attributes="class python:test(error, 'field error', 'field')">
+          <input type="checkbox" name="agree" class="noborder" />
+          <tal:i18n i18n:translate="confimation_text"> I have viewed the <a href="pdf" title="Link to printer-friendly PDF format"
+	                   tal:attributes="href string:$versionURL/pdf"
+	                   i18n:translate="text_print">PDF contents of the book</a> and would like to buy the book. I understand that there are <b>NO REFUNDS</b> for this print-on-demand book.</tal:i18n>
+          <div tal:content="error"
+            i18n:translate="">Validation error output</div>
+        </div>
+        <input type="submit" 
+                class="context" 
+                name="next" 
+                value="Next >>" 
+                tal:attributes="tabindex tabindex/next;" 
+                i18n:attributes="value value_next_with_arrows" />
+        <input type="button" 
+                class="context"
+                onclick="javascript:window.close();" 
+                name="cancel" 
+                value="Cancel" 
+                i18n:attributes="value value_cancel"/>
+      <input type="hidden" name="form.submitted" value="1" />       
+      </form>
+    </div>
+    <metal:left fill-slot="column_two_slot"></metal:left>
+  </body>
+</html>

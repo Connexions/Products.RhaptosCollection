@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n" xml:lang="en-US"
+      lang="en-US"
+      i18n:domain="rhaptos">
+
+<tal:comment tal:replace="nothing">
+Plone 2.5 notes:
+  - folder_contents does have macro hooks now; we will use that instead of complete copy
+  - copied bits are from Plone 2.5.1 version
+  - replace heading (with special custom slot)
+    - i18n msgid here was mis-spelled
+  - no size column
+  - state display uses hrstate first (which uses getObject until we can get it in the catalog metadata)
+  - add alltheway-up/down arrows
+  - remove nbsp in arrows
+  - add spacer div (instead of putting bottom border on form)
+
+  - stop using folder_contents by adding SubCollection to typesUseViewActionInListings
+  - stop change state from appearing by changing property in
+  - site_properties
+  - re-visited the disabled batching by declaring the batch before
+    calling the folder_contents macro
+  - disable drag-and-drop reordering
+
+Rhaptos note:
+  steal folder_contents code
+  add folder_contents defines "standalone, etc" in div
+  remove size column header and content
+  add hr_state to review_state
+  replace icon with hard-coded large icon test
+  add "add items to:" condition in title
+  replace select with hard-coded section button
+  add border bottom style to form
+  zero out "use_folder_contents" variable; could alternately remove
+  remove batching from the top (folder_contents) form.  It doesn't
+      really need ot batch the contents and it interferes with the
+      batching of the search results. 
+  use cc_reorder instead of folder_position to hook col modification notify
+
+  i18n by kclarks
+
+ Original:
+  interior folder listing came from ordered_folder_contents, differing from folder_contents with
+  - select All has no icon (probably we want this)
+  - no size column, a move column
+  - first tr border turned on
+  - checkbox: no alt, title attributes
+  - define tool here/portal_types
+           obj_type python:tool.getTypeInfo(item.portal_type);
+           default_action python:obj_type.getProperty('immediate_view');
+  - no lock section
+  - container.isExpired (isExpired was defined elsewhere)
+  - no size column
+  - long format for mod. date
+  - state uses python:review_state or item.hrstate() or default rather than simple test
+  - adds move column at end
+  - no navigation macros (because ordered?)
+
+</tal:comment>
+
+  <head>
+    <style type="text/css">
+      a.black {color: black}
+      a.grey {color: #777777}
+      table.tight td {
+        padding: 0px;
+        padding-right: 2em;
+        margin: 0px;
+      }
+    </style>
+  </head>
+
+  <body metal:define-macro="panel" tal:define="course here/nearestCourse | here; typename here/archetype_name">
+
+    <!-- Replace with message if collection is published -->
+    <tal:block tal:condition="python:here.state == 'published'"
+	       tal:replace="structure here/content_published" />
+
+    <tal:block tal:condition="python:here.state != 'published'"
+      tal:define="contentFilter contentFilter|request/contentFilter|nothing;
+                  contentsMethod python:test(here.portal_type=='Topic', here.queryCatalog, here.getFolderContents);
+                  batch batch|python:contentsMethod(contentFilter,batch=True, b_size=int(0));">
+
+    <metal:contentsmacro use-macro="context/folder_contents/macros/contents">
+        <h1 metal:fill-slot="h1">
+          <img tal:condition="python:typename=='Course'" tal:replace="structure here/large_collection_icon.gif" />
+          <img tal:condition="python:typename!='Course'" tal:replace="structure here/folder.gif" />
+          <span tal:condition="exists:request/words" tal:omit-tag="" i18n:translate="heading_add_items">Add items to:</span>
+          <span tal:content="here/title_or_id" tal:omit-tag="">Directory Id</span>
+        </h1>
+
+        <div metal:fill-slot="addcontent" id="add-item-pulldown">
+            <tal:comment replace="nothing">
+              I hard code this because we can't think of anything else that would go into a course
+              and we don't want the other legal types to be directly addable (search always).
+              Use the one commented out below if you want to generalize.
+            </tal:comment>
+            <input type="hidden" name="type_name" value="SubCollection" />
+            <input class="standalone"
+                   type="submit"
+                   name="folder_factories:method"
+                   value="Add New Section"
+                   tabindex=""
+                   i18n:attributes="value" i18n:domain="rhaptos"
+                   tal:attributes="tabindex tabindex/next|nothing;"/>
+        </div>
+
+        <metal:header_slot metal:fill-slot="listingheader" i18n:domain="plone">
+                  <th tal:attributes="class python:nosortclass"
+                      >&nbsp;<tal:title i18n:translate="listingheader_title"
+                      >Title</tal:title>&nbsp;</th>
+                  <th class="nosort orderingCell"
+                      tal:condition="python:isOrderable and canModifyFolderContent and not preSorted"
+                      >&nbsp;<tal:order i18n:translate="listingheader_order"
+                      >Order</tal:order>&nbsp;</th>
+        </metal:header_slot>
+        <metal:item_slot metal:fill-slot="item_display" i18n:domain="plone">
+                    <td class="notDraggable"
+                        tal:define="url python:test(item_use_view, item_url+'/view',
+                                    test(item_folderish, item_url+'/folder_contents', item_url+'/'));">
+                        <span tal:attributes="class item_type_class">
+                        <a href="#" tal:attributes="href  url;
+                                                  title string: $item_type: $item_description;
+                                                  class string:$item_wf_state_class visualIconPadding;">
+                            <strong tal:omit-tag="python:not isBrowserDefault">
+                            <span tal:replace="item_title_or_id">
+                              Item Title
+                            </span>
+                            </strong>
+                        </a>
+                        </span>
+
+                        <span class="state-expired"
+                              tal:condition="python:portal.isExpired(item)"
+                              i18n:translate="time_expired">expired</span>
+                    </td>
+                    <td class="notDraggable orderingCell"
+                        tal:define="pps python:modules['Products.PythonScripts.standard'];
+                                    quoted_item_id python:pps.url_quote(item_id);
+                                    arrowTop portal/arrowTop.gif;
+                                    arrowBottom portal/arrowBottom.gif;"
+                        tal:condition="python:isOrderable and canModifyFolderContent and not preSorted">
+                      <a href=""
+                         title="Move item to top"
+                         i18n:attributes="title title_move_item_top"
+                         tal:attributes="href string:$here_url/cc_reorder?position=top&amp;id=$quoted_item_id&amp;template_id=${template_id}"
+                         ><img tal:replace="structure arrowTop" /></a>
+                      <a href=""
+                         title="Move item up"
+                         i18n:attributes="title title_move_item_up;"
+                         tal:attributes="href string:$here_url/cc_reorder?position=up&amp;id=$quoted_item_id&amp;template_id=${template_id}"
+                         ><img tal:replace="structure arrowUp" /></a>
+                      <a href=""
+                         title="Move item down"
+                         i18n:attributes="title title_move_item_down;"
+                         tal:attributes="href string:$here_url/cc_reorder?position=down&amp;id=$quoted_item_id&amp;template_id=${template_id}"
+                         ><img tal:replace="structure arrowDown" /></a>
+                      <a href=""
+                         title="Move item to bottom"
+                         i18n:attributes="title title_move_item_bottom"
+                         tal:attributes="href string:$here_url/cc_reorder?position=bottom&amp;id=$quoted_item_id&amp;template_id=${template_id}"
+                         ><img tal:replace="structure arrowBottom" /></a>
+                    </td>
+        </metal:item_slot>
+
+    </metal:contentsmacro>
+
+    <div style="border-bottom: 1px solid #8CACBB;">&nbsp;</div>
+
+    <div tal:define="workspace here/nearestWorkspace;
+                     location python:getattr(request,'location','');
+                     inWorkspace python:location=='workspace';
+                     words request/words | nothing;
+                     raw_results python:words and (inWorkspace and workspace.searchWorkspace() or here.search_form_handler()) or {};
+                     results python:[m for m in raw_results if m.objectId not in here.containedModuleIds()];
+                     searchhash request/searchhash | nothing;
+                     length python:len(results);
+                     global found length">
+
+      <form action="." name="search"
+            tal:attributes="action template/id"
+            style="padding-top: 1em;">
+        <small><strong 
+              i18n:translate="text_search_for_modules">Search Content Commons for modules to add:</strong></small><br />
+        <!--<input type="radio" name="location" value="repository" checked="true"
+               tal:attributes="checked not:inWorkspace | default" /> Content Commons
+        <input type="radio" name="location" value="workspace"
+               tal:attributes="checked inWorkspace | default" /> this Workspace-->
+	    <input type="hidden" name="location" value="repository" />
+
+    <input type="hidden" name="portal_types:list" value="Module" />
+    <input type="text" name="words" size="50"
+               style="margin-top: 0.5em"
+               tal:attributes="value words;
+               tabindex tabindex/next" />
+    <input class="context searchButton" type="submit" value="Search"
+                      style="margin-top: 0.5em"
+                      tal:attributes="tabindex tabindex/next"
+                      i18n:attributes="value value_collection_panel_search"/>
+    <input type="hidden"
+           name="inContext"
+           tal:attributes="value string:True" />
+
+          </form>
+
+          <tal:block tal:define="loggedIn python:True;
+            inContext python:True;
+            inCourse python:True"
+            tal:condition="found">
+            <tal:block metal:use-macro="here/search_macros/macros/search_results" tal:condition="found"/>
+          </tal:block>
+	  
+          <tal:block tal:define="searched exists:request/words" tal:condition="python:searched and not found">
+            <metal:block metal:use-macro="here/search_macros/macros/no_matches_text" />
+          </tal:block>
+          
+	</div>
+
+    </tal:block>
+  </body>
+</html>

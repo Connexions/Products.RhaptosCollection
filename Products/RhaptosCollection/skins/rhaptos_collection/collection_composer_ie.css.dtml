@@ -1,0 +1,8 @@
+/* Unfortunate IE fixes */
+ul.x-tree-node-ct {
+    width: 100%;
+}    
+
+ul.x-tree-node-ct li.x-tree-node {
+    margin: 0 0 0 1.5em !important;
+}

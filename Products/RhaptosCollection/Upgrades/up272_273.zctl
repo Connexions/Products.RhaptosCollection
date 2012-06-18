@@ -1,0 +1,14 @@
+for l in app.plone.content.objectValues('Version Folder'):
+  for v in l.objectValues('Collection'):
+    if v.institution != v.institution.strip():
+      v.institution = v.institution.strip()
+
+groups=[g for g in app.plone.GroupWorkspaces.objectValues()]
+groups.extend(app.plone.Members.objectValues())
+
+for g in groups:
+  for v in g.objectValues('Collection'):  
+    if v.institution != v.institution.strip():  
+      v.institution = v.institution.strip()  
+
+get_transaction().commit()

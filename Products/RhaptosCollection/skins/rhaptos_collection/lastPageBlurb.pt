@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xml:lang="en-US" lang="en-US"
+      i18n:domain="rhaptos"
+      tal:define="charset context/plone_utils/getSiteEncoding;
+                  dummy python:request.RESPONSE.setHeader('Content-Type', 'text/html;;charset=%s' % charset)">
+  <head>
+    <title>Last-Page Blurb for <tal:block tal:content="context/portal_properties/title">Site Name</tal:block></title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <style type="text/css" media="all">
+<!--
+    body div {
+      margin-bottom: 0.5em;
+    }
+    
+    .field {
+      font-weight: bold;
+    }
+-->
+    </style>
+
+</head>
+
+  <body>
+
+    <p class="about">This template exists solely to make the "lastPageBlurb" print property available to the print 
+system via URL. This is a body of plain text about the hosting site, and it appears on the last page of the PDF (last 
+interior page of the book).</p>
+
+    <div class="lastpageblurb">
+      <span class="field">Last Page Blurb:</span>
+      <span class="data" tal:content="context/portal_properties/rhaptos_collection_print_config/lastPageBlurb | default">
+      </span>
+    </div>
+
+  </body>
+</html>

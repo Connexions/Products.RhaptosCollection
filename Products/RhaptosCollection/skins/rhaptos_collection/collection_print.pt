@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="here/content_template/macros/master"
+      i18n:domain="rhaptos"
+>
+<tal:comment>
+i18n by cbearden@rice.edu
+</tal:comment>
+  <body>
+    <div metal:fill-slot="main" id="about">
+      <p i18n:translate="text_collprint_course_print">
+        Automatic printing is not yet available for courses. Please email
+	<span i18n:name="tech_support_email">
+	  <a href="mailto:techsupport@cnx.rice.edu">techsupport@cnx.rice.edu</a> 
+	</span>
+	  to request a printed version of a course.
+      </p>
+    </div>
+  </body>
+</html>

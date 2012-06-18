@@ -1,0 +1,9 @@
+# we need to run as big user since we do a catalog query in the reinstall
+from AccessControl.SecurityManagement import newSecurityManager
+from Products.CMFCore.tests.base.security import AnonymousUser, OmnipotentUser
+user = OmnipotentUser().__of__(app)
+newSecurityManager(None, user)
+
+app.plone.portal_quickinstaller.reinstallProducts(['RhaptosCollection'])
+
+get_transaction().commit()

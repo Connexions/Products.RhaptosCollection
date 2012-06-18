@@ -1,0 +1,108 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five">
+
+   <browser:resourceDirectory
+      name="collection-composer-resources"
+      directory="resources" 
+      /> 
+
+   <browser:page
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="js-tree-definition"
+      template="js_tree_definition.pt"
+      permission="zope2.View" />
+
+    <!-- Add subcollections to collection -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="collection-composer-collection-subcollection"
+      class=".collection_subcollection.CollectionSubcollectionView"      
+      template="templates/collection_subcollection.pt"
+      permission="cmf.AddPortalContent" 
+      />
+
+   <!-- Add subcollections to subcollection -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-collection-subcollection"
+      class=".collection_subcollection.CollectionSubcollectionView"      
+      template="templates/collection_subcollection.pt"
+      permission="cmf.AddPortalContent" 
+      />
+
+   <!-- Add modules to collection -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="collection-composer-collection-module"
+      class=".collection_module.CollectionModuleView"      
+      template="templates/collection_module.pt"
+      permission="cmf.AddPortalContent" 
+      />
+
+   <!-- Add modules to subcollection. Essentially the same as adding to a 
+        collection. -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-collection-module"
+      class=".collection_module.CollectionModuleView"      
+      template="templates/collection_module.pt"
+      permission="cmf.AddPortalContent" 
+      />
+
+   <!-- Edit collection title -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="collection-composer-collection-title"
+      class=".collection_title.CollectionTitleView"      
+      template="templates/collection_title.pt"
+      permission="cmf.ModifyPortalContent" 
+      />
+
+   <!-- Edit subcollection title -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-subcollection-title"
+      class=".subcollection_title.SubCollectionTitleView"      
+      template="templates/subcollection_title.pt"
+      permission="cmf.ModifyPortalContent" 
+      />
+
+   <!-- Edit module title -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-module-title"
+      class=".module_title.ModuleTitleView"      
+      template="templates/module_title.pt"
+      permission="cmf.ModifyPortalContent" 
+      />
+
+   <!-- Featured links -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-featured-links"
+      class=".featured_links.FeaturedLinksView"      
+      template="templates/featured_links.pt"
+      permission="cmf.AddPortalContent" 
+      />
+
+   <!-- Remove contained -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollectionContained"
+      name="collection-composer-remove-contained"
+      class=".remove_contained.RemoveContainedView"      
+      template="templates/remove_contained.pt"
+      permission="cmf.ModifyPortalContent" 
+      />
+
+   <!-- Drag n drop -->
+   <browser:page     
+      for="Products.RhaptosCollection.interfaces.ICollection"
+      name="collection-composer-drag-drop"
+      class=".drag.DragView"      
+      attribute="drop"
+      permission="cmf.ModifyPortalContent" 
+      />
+
+</configure>

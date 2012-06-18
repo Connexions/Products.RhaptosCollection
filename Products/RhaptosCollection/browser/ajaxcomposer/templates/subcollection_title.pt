@@ -1,0 +1,101 @@
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+
+    var popup = $('div#collection-composer-popup');
+    $('input, select, textarea', popup).bind('change', function(){
+        $('div#collection-composer-popup').addClass('modified');
+    });
+
+    var subcollection_cancel_handler = function(event){
+        event.preventDefault();
+        popup.removeClass('modified');
+        composer_window.close();
+    };
+    $('input#collection-composer-cancel').bind('click', subcollection_cancel_handler);
+
+    var subcollection_title_handler = function(event){
+        event.preventDefault();
+
+        var url = $(this).attr('action');
+        $.ajax({
+            type: 'POST',
+            url: url,
+            async: false,
+            data: $('input', this).serialize(),
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {                   
+                    // Update tree node and close popup
+                    var title = data.substring(6);
+                    var node = find_treenode(collection_composer_tree.getRootNode(), '<span tal:replace="context/getId" />');
+                    node.setText(title);
+                    $('div#collection-composer-popup').removeClass('modified');
+                    composer_window.close();
+                    return;
+                }
+                else
+                    $('div#<span tal:replace="view/__name__" />-body').html(data);
+            }  
+        }); 
+
+        // Rebind
+        $('form#<span tal:replace="view/__name__" />-form').bind('submit', subcollection_title_handler);
+        $('input#collection-composer-cancel').bind('click', subcollection_cancel_handler);
+    }
+
+    $('form#<span tal:replace="view/__name__" />-form').bind('submit', subcollection_title_handler);    
+
+});
+<span tal:replace="structure string:</script>" />
+
+<div class="cnx_popup" id="collection-composer-popup">
+    <div class="x-dlg-bd" id="collection-composer-subcollection-title-body">
+    <metal:macro define-macro="body">
+        <div class="popup_scale_fixer">
+
+            <div class="popup-header-prefix">
+                <strong i18n:translate="edit_title_of_subcollection">
+                    Edit the title of subcollection
+                </strong>
+            </div>
+
+            <h1 class="popup-header">
+                <img tal:attributes="src string:${context/portal_url}/folder_icon.gif" alt="" title="">
+                <span tal:replace="context/Title" />
+            </h1>
+
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                 id string:${view/__name__}-form"
+                  name="form"
+                  method="post">
+
+                <input name="form.submitted" 
+                       value="1" 
+                       type="hidden" />
+
+                <div tal:define="error errors/title|nothing"
+                     tal:attributes="class python:error and 'field error' or 'field'"
+                     style="margin: .5em 0;">
+
+                    <div tal:content="error" />
+
+                    <input tal:attributes="value request/title|context/Title"
+                           name="title" type="text" size="40" id="ugh" />
+                </div>
+
+                <input i18n:attributes="value save"
+                       name="save" class="standalone" type="submit" value="Save" />
+                <input i18n:attributes="value cancel"
+                       name="cancel" class="standalone" type="submit" value="Cancel" 
+                       id="collection-composer-cancel"
+                       />
+
+            </form>
+
+        </div>
+    </metal:macro>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

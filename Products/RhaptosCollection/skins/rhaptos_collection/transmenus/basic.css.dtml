@@ -1,0 +1,37 @@
+#mainMenu {
+    position:absolute;
+    top:15px;
+    left:15px;
+    padding:0px;
+    margin:0px;
+    list-style-image:none;
+    list-style-type:none;
+}
+#mainMenu li {
+    list-style-image:none;
+    list-style-type:none;
+}
+#mainMenu a, #mainMenu a:active, #mainMenu a:visited {
+    color:#999;
+    text-decoration:none;
+}
+#mainMenu a:hover {
+    color:#660000;
+}
+
+#collapsibleDemo li {
+    list-style-image:none;
+    list-style-type:none;
+    margin-bottom:2px;
+    margin-top:0px;
+    padding-right:0px;
+    padding-left:0px;
+    padding: 3px;
+}
+
+#collapsibleDemo li ul {
+    list-style-image:none;
+    list-style-type:none;
+    margin-bottom:2px;
+    margin-top:2px;
+}

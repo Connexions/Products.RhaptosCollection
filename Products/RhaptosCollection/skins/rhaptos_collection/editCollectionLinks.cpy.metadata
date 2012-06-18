@@ -1,0 +1,3 @@
+[actions]
+action.success = traverse_to:string:collection_composer?panel=collection_links
+

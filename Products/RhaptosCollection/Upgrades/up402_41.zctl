@@ -1,0 +1,4 @@
+app.plone.portal_quickinstaller.reinstallProducts(['RhaptosCollection'])
+
+import transaction
+transaction.commit()

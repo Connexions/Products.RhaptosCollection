@@ -1,0 +1,127 @@
+<script tal:attributes="src string:${context/portal_url}/composer_classes.js"
+        type="text/javascript"></script>
+
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+
+    $('#kss-spinner').ajaxStart(function(){
+        $(this).show();
+    });
+    $('#kss-spinner').ajaxStop(function(){
+        $(this).hide();
+    });
+
+
+    var popup = $('div#collection-composer-popup');
+    $('input, select, textarea', popup).bind('change', function(){
+        $('div#collection-composer-popup').addClass('modified');
+    });
+
+    var collection_cancel_handler = function(event){
+        event.preventDefault();
+        popup.removeClass('modified');
+        composer_window.close();
+    };
+
+    var collection_subcollection_handler = function(event){
+        event.preventDefault();
+
+        var url = $(this).attr('action');
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: $('input,textarea', this).serialize(),
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {                                      
+                    // Create child nodes
+                    var node = find_treenode(collection_composer_tree.getRootNode(), '<span tal:replace="context/getId" />');
+
+                    var arr = eval(data.substring(6));
+                    for (var i=0;i<span tal:replace="structure string:&lt;" />arr.length;i++)                    
+                    {
+                        var newnode = new SubCollection(arr[i]);
+                        node.appendChild(newnode);
+                    }
+                    node.expand();
+
+                    $('div#collection-composer-popup').removeClass('modified');
+                    composer_window.close();
+                    return;
+                }
+                else
+                    $('div#<span tal:replace="view/__name__" />-body').html(data);
+            }
+        }); 
+
+        // Rebind
+        $('input#collection-composer-cancel').bind('click', collection_cancel_handler);
+        $('form#<span tal:replace="view/__name__" />-form').bind('submit', collection_subcollection_handler);
+    }
+
+    $('input#collection-composer-cancel').bind('click', collection_cancel_handler);
+    $('form#<span tal:replace="view/__name__" />-form').bind('submit', collection_subcollection_handler);    
+
+});
+<span tal:replace="structure string:</script>" />
+
+<div class="cnx_popup" id="collection-composer-popup">
+    <div class="x-dlg-bd" id="collection-composer-collection-subcollection-body">
+    <metal:macro define-macro="body">
+        <div class="popup_scale_fixer">
+
+            <div class="popup-header-prefix">
+                <strong i18n:translate="add_new_subcollections_to">
+                    Add new subcollections to
+                </strong> 
+            </div>
+            <h1 class="popup-header"
+                tal:define="isCollection python:context.portal_type == 'Collection'">
+                <img tal:condition="isCollection"
+                     tal:attributes="src string:${context/portal_url}/collection-level.gif" alt="" title="">   
+                <img tal:condition="not:isCollection"
+                     tal:attributes="src string:${context/portal_url}/folder_icon.gif" alt="" title="">
+                <span tal:replace="context/Title" />
+            </h1>
+
+            <div class="formHelp">
+                These will follow any existing subcollections and modules at this level.  To move them higher, or otherwise rearrange them, use the drag and drop feature in the 
+                collection editor main window.
+            </div>
+
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                 id string:${view/__name__}-form"
+                  method="post">
+
+                <input name="form.submitted" 
+                       value="1" 
+                       type="hidden" />
+
+                <small>
+                    <strong i18n:translate="enter_one_per_line">Enter one per line</strong>
+                </small>
+                <div tal:define="error errors/titles|nothing"
+                     tal:attributes="class python:error and 'field error' or 'field'"
+                     style="margin: .5em 0;">
+
+                    <div tal:content="error" />
+
+                    <textarea tal:attributes="value request/titles|nothing"
+                              name="titles"
+                              rows="5" style="width: 50%;"></textarea>
+                </div>
+
+                <input class="standalone" name="submit" value="Add new subcollections" tabindex="0" type="submit"
+                       i18n:attributes="value add_new_subcollections">
+                <input class="standalone" name="cancel" value="Cancel" tabindex="0" type="submit"
+                       i18n:attributes="value cancel"
+                       id="collection-composer-cancel" />
+            </form>
+
+        </div>
+    </metal:macro>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

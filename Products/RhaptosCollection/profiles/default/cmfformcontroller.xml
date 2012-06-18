@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<cmfformcontroller>
+  <!-- folder_cut... -->
+  <!-- action.success.Collection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_cut"
+    status="success"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+  <!-- action.failure.Collection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_cut"
+    status="failure"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.success.SubCollection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_cut"
+    status="success"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+  <!-- action.failure.SubCollection=redirect_to_action:string:view  -->
+  <action
+    object_id="folder_cut"
+    status="failure"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+  
+  <!-- folder_delete... -->
+  <!-- action.success.Collection=redirect_to:string:content_delete_post -->
+  <action
+    object_id="folder_delete"
+    status="success"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to"
+    action_arg="string:content_delete_post"
+    />
+
+  <!-- action.failure.Collection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_delete"
+    status="failure"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.success.SubCollection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_delete"
+    status="success"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.failure.SubCollection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_delete"
+    status="failure"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- folder_paste... -->
+  <!-- action.success.Collection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_paste"
+    status="success"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.failure.Collection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_paste"
+    status="failure"
+    context_type="Collection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.success.SubCollection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_paste"
+    status="success"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+  <!-- action.failure.SubCollection=redirect_to_action:string:view -->
+  <action
+    object_id="folder_paste"
+    status="failure"
+    context_type="SubCollection"
+    button=""
+    action_type="redirect_to_action"
+    action_arg="string:view"
+    />
+
+</cmfformcontroller>

@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n" xml:lang="en-US" lang="en-US"
+      metal:use-macro="container/module_template/macros/master"
+      i18n:domain="rhaptos">
+
+    <tal:comment>
+    i18n by: mhutch
+    </tal:comment>
+
+  <body>
+
+    <div metal:fill-slot="main" tal:define="errors options/state/getErrors;
+                                            license_data here/getLicenseData;
+                                            license_version license_data/version;
+                                            license_label license_data/label;
+                                            license_url context/license;
+                                            default_license context/getDefaultLicense;
+                                            default_license_data python:context.getLicenseData(default_license);
+                                            default_license_version default_license_data/version;
+                                            default_license_label default_license_data/label;
+                                            needLicenseUpgrade python:test(license_url!=default_license);
+                                            isPublisher here/isPublisher;
+                                            canPublish here/canPublish;
+">
+
+
+      <h2 i18n:translate="heading_publish_collection">Publish collection</h2>
+
+    <tal:license tal:condition="needLicenseUpgrade"  tal:define="status string:license; newCollectionTitle python:'License agreement';
+     message python:'The publication license agreement has changed since you last agreed to it.  The previous license on this content was the Creative Commons %(name)s License, Version %(version)s. You will need to accept the new license prior to publishing.' % license_data"> 
+    <div class="portalMessage" tal:content="message">Upgrade</div>
+        <div metal:use-macro="container/cc_license/macros/license" />
+    </tal:license>
+
+   <tal:gotlicense tal:condition="not:needLicenseUpgrade">
+      <tal:block tal:condition="not:canPublish">
+  <div style="border: 2px solid rgb(238, 119, 0); margin: 0.5em 0pt; padding: 0.5em; background-color: rgb(255, 238, 119);">
+	<p i18n:translate="text_coursepub_cantpublish">
+	  <span i18n:name="warning"><strong i18n:translate="text_note">PUBLISH BLOCKED:</strong></span>
+	  You do not have <strong>maintainer permissions</strong> on the published version of this object, so you will not be able to publish the current revision. But you may
+          <a href="confirm_fork" i18n:translate="label_coursepub_createcourse">derive your own copy</a>
+         based on this collection.
+	</p>
+</div>
+	</tal:block>
+
+      <tal:block tal:condition="python:canPublish and isPublisher">
+	  <p><strong i18n:translate="text_coursepub_reminders">Before you publish, did you remember to:</strong></p>
+	  <ul>
+	    <li i18n:translate="text_coursepub_remindmeta">Edit the 
+	    <span i18n:name="metadata">
+	      <a href="collection_metadata" i18n:translate="label_coursepub_editmeta">metadata</a>
+	    </span>, 
+	    adding keywords and a summary</li>
+	    <li i18n:translate="text_coursepub_remindroles">Verify that the 
+	    <span i18n:name="roles">
+	      <a href="content_roles" i18n:translate="label_coursepub_editroles">roles</a>
+	    </span> are correct</li>
+	    <li i18n:translate="text_coursepub_remindpreview">Check that the 
+	    <span i18n:name="online">
+	      <a href="preview" i18n:translate="label_coursepub_preview">online</a>
+	    </span> version of the course is correct</li>
+	    <li i18n:translate="text_coursepub_remindchecklinks">Verify that the links in your modules are not broken</li>
+	  </ul>
+	<form action="publish" method="post" tal:attributes="action template/getId">
+
+        <div class="field"
+	       tal:define="error errors/message| nothing; message request/message | here/message"
+	       tal:attributes="class python:test(error, 'field error', 'field')">
+	    <label i18n:translate="label_message">Description of Changes</label>
+	    <span class="fieldRequired" title="Required"
+	         i18n:attributes="title"
+	         i18n:translate="label_required">(Required)</span>
+	    <div i18n:translate="help_message_creation" class="formHelp">
+	      Please enter a description of the changes you've made to the course
+	    </div>
+	    
+	    <div tal:content="error" i18n:translate="">Validation error output</div>
+	    
+	    <textarea name="message" 
+		          wrap="soft" 
+                          cols="50" 
+	                  style="width: 50%"
+                          rows="5"
+                          tal:attributes="tabindex tabindex/next;"
+	                  tal:content="message"></textarea>
+	  </div>
+
+	  <input type="submit" class="context" name="form.button.publish" value="Publish" tal:attributes="tabindex tabindex/next;" i18n:attributes="value publish" />
+          <input type="hidden" name="form.submitted" value="1" />
+	</form>
+	<p i18n:translate="text_license_allow"
+           style="margin-top: 1em;">This work will now be distributed under the terms of the Creative Commons Attribution License
+          <span i18n:name="license_name">
+            (<span i18n:translate=""
+                  tal:content="license_label">[(CC-BY 3.0)]</span>)
+          </span> 
+        available at 
+        <a style="font-style: italic"
+          tal:attributes="href license_url"
+          tal:content="license_url"
+          i18n:name="license_url">[license url]</a>.  I understand
+	      that in doing so I </p>
+		<ol>
+			<li i18n:translate="text_license_retain_copyright"> 
+	          retain my copyright in the work and </li>
+	        <li i18n:translate="text_license_owner_permission"> 
+	          warrant that I am the author or the owner or have
+		      permission to distribute the work in question and 
+			</li>
+			<li i18n:translate="text_license_work_distributed"> 
+	          wish this work to be distributed under the terms of the
+	          <span i18n:name="license_link">
+		          <a i18n:translate="" tal:attributes="href license_url"
+                             tal:content="license_label">[CC-BY 3.0]</a>
+		      </span> license
+		  (<b>including allowing modification of this work and requiring
+		  attribution</b>) and </li>
+		  <li i18n:translate="text_license_proper_attribution"> 
+	          agree that proper attribution of my work is any attribution that includes the authors' names, the title of the work, and the 
+	          <span i18n:name="portal" tal:replace="portal/title">[portal]</span> 
+	          URL to the work.  </li>
+		</ol>
+	</tal:block>
+
+      <tal:block tal:condition="python: canPublish and not(isPublisher)">
+  <div style="border: 2px solid rgb(238, 119, 0); margin: 0.5em 0pt; padding: 0.5em; background-color: rgb(255, 238, 119);">
+	<p i18n:translate="text_coursepub_cantpublish">
+	  <span i18n:name="warning"><strong i18n:translate="text_note">PUBLISH BLOCKED:</strong></span>
+	  You do not have <strong>publishing permissions</strong>	</p>
+</div>
+	  <p><strong i18n:translate="text_coursepub_reminders">Before you submit for publication, did you remember to:</strong></p>
+	  <ul>
+	    <li i18n:translate="text_coursepub_remindmeta">Edit the 
+	    <span i18n:name="metadata">
+	      <a href="collection_metadata" i18n:translate="label_coursepub_editmeta">metadata</a>
+	    </span>, 
+	    adding keywords and a summary</li>
+	    <li i18n:translate="text_coursepub_remindroles">Verify that the 
+	    <span i18n:name="roles">
+	      <a href="content_roles" i18n:translate="label_coursepub_editroles">roles</a>
+	    </span> are correct</li>
+	    <li i18n:translate="text_coursepub_remindpreview">Check that the 
+	    <span i18n:name="online">
+	      <a href="preview" i18n:translate="label_coursepub_preview">online</a>
+	    </span> version of the course is correct</li>
+	    <li i18n:translate="text_coursepub_remindchecklinks">Verify that the links in your modules are not broken</li>
+	  </ul>
+	<form action="publish" method="post" tal:attributes="action template/getId">
+
+        <div class="field"
+	       tal:define="error errors/message| nothing; message request/message | here/message"
+	       tal:attributes="class python:test(error, 'field error', 'field')">
+	    <label i18n:translate="label_message">Description of Changes</label>
+	    <span class="fieldRequired" title="Required"
+	         i18n:attributes="title"
+	         i18n:translate="label_required">(Required)</span>
+	    <div i18n:translate="help_message_creation" class="formHelp">
+	      Please enter a description of the changes you've made to the course
+	    </div>
+	    
+	    <div tal:content="error" i18n:translate="">Validation error output</div>
+	    
+	    <textarea name="message" 
+		          wrap="soft" 
+                          cols="50" 
+	                  style="width: 50%"
+                          rows="5"
+                          tal:attributes="tabindex tabindex/next;"
+	                  tal:content="message"></textarea>
+	  </div>
+
+	  <input type="submit" class="context" name="form.button.submit" value="Submit for Publication" tal:attributes="tabindex tabindex/next;" i18n:attributes="value publish" />
+          <input type="hidden" name="form.submitted" value="1" />
+	</form>
+	<p i18n:translate="text_license_allow"
+           style="margin-top: 1em;">This work will now be distributed under the terms of the Creative Commons Attribution License
+          <span i18n:name="license_name">
+            (<span i18n:translate=""
+                  tal:content="license_label">[(CC-BY 3.0)]</span>)
+          </span> 
+        available at 
+        <a style="font-style: italic"
+          tal:attributes="href license_url"
+          tal:content="license_url"
+          i18n:name="license_url">[license url]</a>.  I understand
+	      that in doing so I </p>
+		<ol>
+			<li i18n:translate="text_license_retain_copyright"> 
+	          retain my copyright in the work and </li>
+	        <li i18n:translate="text_license_owner_permission"> 
+	          warrant that I am the author or the owner or have
+		      permission to distribute the work in question and 
+			</li>
+			<li i18n:translate="text_license_work_distributed"> 
+	          wish this work to be distributed under the terms of the
+	          <span i18n:name="license_link">
+		          <a i18n:translate="" tal:attributes="href license_url"
+                             tal:content="license_label">[CC-BY 3.0]</a>
+		      </span> license
+		  (<b>including allowing modification of this work and requiring
+		  attribution</b>) and </li>
+		  <li i18n:translate="text_license_proper_attribution"> 
+	          agree that proper attribution of my work is any attribution that includes the authors' names, the title of the work, and the 
+	          <span i18n:name="portal" tal:replace="portal/title">[portal]</span> 
+	          URL to the work.  </li>
+		</ol>
+	</tal:block>
+	</tal:gotlicense>
+
+    </div>
+  </body>
+</html>

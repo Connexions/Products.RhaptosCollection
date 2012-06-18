@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xml:lang="en-US" lang="en-US"
+      i18n:domain="rhaptos"
+      tal:define="charset context/plone_utils/getSiteEncoding;
+                  dummy python:request.RESPONSE.setHeader('Content-Type', 'text/html;;charset=%s' % charset)">
+  <head>
+    <title>Print Information for <tal:block tal:content="context/objectId">col10000</tal:block></title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <style type="text/css" media="all">
+<!--
+    body div {
+      margin-bottom: 0.5em;
+    }
+    
+    .field {
+      font-weight: bold;
+    }
+
+    .description {
+       color: gray;
+    }
+    
+    .author {
+      margin-right: 1em;
+      padding-right: 0.5em;
+      border-right: thin solid black;
+    }
+    
+    .username {
+      color: silver;
+    }
+-->
+    </style>
+
+</head>
+  <body tal:define="pfile context/getPrintedFile;
+                    pdfexists python:pfile and pfile.get_size()">
+    <p class="about">Information about this collection, useful in printing it as a book. This is formatted
+      in XHTML, each data point being contained in a div of a specific class. Each div contains information about
+      the field and the value of the field in separate elements. This is mostly for human consumption: a parser will
+      only need to know the <code>div.class</code> and <code>div.class span.data</code> values.
+    </p>
+
+    <div class="url">
+      <span class="field">URL:</span>
+      <span class="data" tal:define="url context/absolute_url">
+        <a tal:content="url" tal:attributes="href url"
+           href="http://cnx.org/content/col10000/latest/">http://cnx.org/content/col10000/latest/</a>
+      </span>
+      <div class="description">
+        URL to link to the online version of this collection.
+      </div>
+    </div>
+
+    <div class="pdfurl" tal:condition="python:pdfexists">
+      <span class="field">Download PDF URL:</span>
+      <span class="data" tal:define="url string:${context/absolute_url}/pdf">
+        <a tal:content="url" tal:attributes="href url"
+           href="http://cnx.org/content/col10000/latest/pdf">http://cnx.org/content/col10000/latest/pdf</a>
+      </span>
+      <div class="description">
+        URL to trigger browser download for the printed version of the collection.
+      </div>
+    </div>
+    
+    <div class="realpdfurl" tal:condition="python:pdfexists">
+      <span class="field">View PDF URL:</span>
+      <span class="data" tal:define="url string:${context/absolute_url}/pdfview">
+        <a tal:content="url" tal:attributes="href url"
+           href="http://cnx.org/content/col10000/latest/pdfview">http://cnx.org/content/col10000/latest/pdfview</a>
+      </span>
+      <div class="description">
+        URL for the printed version of the collection.
+      </div>
+    </div>
+
+    <div class="id">
+      <span class="field">ID:</span>
+      <span class="data" tal:content="context/objectId">col10000</span>
+      <div class="description">
+        Unique-per-repository identifier for this collection.
+      </div>
+    </div>
+
+    <div class="pdfavailable">
+      <span class="field">PDF Available:</span>
+      <span class="data" tal:condition="pdfexists">True</span>
+      <span class="data" tal:condition="not:pdfexists">False</span>
+      <div class="description">
+        True iff a PDF is currently available for this version. If True, other data will be present; otherwise
+        no additional data will be supplied, as printing is impossible.
+      </div>
+    </div>
+
+    <div class="orderable" tal:define="orderable context/getOrderable">
+      <span class="field">Order button available?:</span>
+      <span class="data" tal:condition="orderable">True</span>
+      <span class="data" tal:condition="not:orderable">False</span>
+      <div class="description">
+        Value of boolean field on collection which controls whether or not to show the "Order printed copy"
+        button (if PDF is available and all other conditions are met.)
+      </div>
+    </div>
+
+    <div class="buyLink" tal:define="buyLink context/buyLink|nothing" tal:condition="buyLink">
+      <span class="field">External buying link:</span>
+      <span class="data" tal:define="url context/buyLink">
+        <a tal:content="url" tal:attributes="href url"
+           href="http://cnx.org/content/col10000/latest/pdfview">http://cnx.org/content/col10000/latest/pdfview</a>
+      </span>
+      <div class="description">
+        Value of buyLink property, usually set on the Collection folder itself.
+      </div>
+    </div>
+
+    <div class="status">
+      <span class="field">Process status:</span>
+      <span class="data" tal:content="context/getProcessStatus">blank</span>
+      <div class="description">
+        For internal use only!
+        Information about the printing status of this collection. Values can be:
+        "blank" for no printing current or past;
+        "locked" for a collection that will not be reprinted on publish;
+        "working" when the print process is running;
+        "succeeded" for a print process that has completed successfully;
+        "failed" for a print process that has not completed successfully.
+        This state should not be used for determining if there is a PDF available. There are some
+        cases where 'working' may persist after the process has failed, so don't take it too seriously.
+      </div>
+    </div>
+
+<tal:extended tal:define="showall exists:request/all"
+              tal:condition="python: showall or pdfexists">
+
+    <div class="version">
+      <span class="field">Version:</span>
+      <span class="data" tal:content="context/version">1.11</span>
+      <div class="description">
+        Explicit version of this collection (structure/metadata, not including module content, which is
+        independently versioned).
+      </div>
+    </div>
+
+    <div class="title">
+      <span class="field">Title:</span>
+      <span class="data" tal:content="context/title">Why You Should Pet Your Dog</span>
+      <div class="description">
+        Title of collection.
+      </div>
+    </div>
+
+    <div class="summary">
+      <span class="field">Summary:</span>
+      <span class="data"
+            tal:define="abstract context/getAbstract;
+                        pss modules/Products/PythonScripts/standard;
+                        abstract python:abstract.replace('&amp;','and').replace('&lt;','less than');
+                        abstract python:pss.html_quote(abstract).replace('&amp;','.')"
+            tal:content="structure abstract">Lorem ipsum dolor sit amet.</span>
+      <div class="description">
+        Author-supplied summary of the collection. Note: slightly processed to avoid output of control characters.
+      </div>
+    </div>
+
+    <div class="printdate">
+      <span class="field">Print Date:</span>
+      <span class="data" tal:content="context/getLastPrinted">True</span>
+      <div class="description">
+        Date of the time the current PDF was generated.
+      </div>
+    </div>
+
+    <div class="authors">
+      <span class="field">Authors:</span>
+      <span class="data">
+        <span class="author"
+              tal:repeat="author context/authors">
+          <tal:inner tal:define="m python:context.desecured.getMemberById(author);
+                                 name m/fullname">
+             <span class="username" tal:content="author">alice</span>
+             <span class="fullname" tal:content="name">Alice Liddell</span>
+          </tal:inner>
+        </span>
+      </span>
+      <div class="description">
+        A list of all authors of this collection.
+      </div>
+    </div>
+
+    <div class="pages">
+      <span class="field">Pages:</span>
+      <span class="data" tal:content="context/getPrintedFilePages">--not yet implemented--</span>
+      <div class="description">
+        Length of PDF in pages. (Which is not actual leaves in book, they being two-sided.)
+      </div>
+    </div>
+
+    <div class="dimension-height">
+      <span class="field">Page height:</span>
+      <span class="data">11</span>
+      <div class="description">
+        Page height, in inches.
+      </div>
+    </div>
+
+    <div class="dimension-width">
+      <span class="field">Page width:</span>
+      <span class="data">8.5</span>
+      <div class="description">
+        Page width, in inches.
+      </div>
+    </div>
+
+    <div class="siteblurb">
+      <span class="field">Site blurb:</span>
+      <span class="data"
+            tal:define="siteblurb context/portal_properties/rhaptos_collection_print_config/buyBookSiteBlurb | default;
+                        license context/license"
+            tal:content="python:siteblurb % {'license':license}">
+      </span>
+      <div class="description">
+        Some text about the hosting site, for use on ordering screen. In plain text with some escaped markup for newlines and bold.
+      </div>
+    </div>
+
+    <div class="cnxblurb">
+      <span class="field">Connexions blurb:</span>
+      <span class="data" tal:content="context/portal_properties/rhaptos_collection_print_config/buyBookCnxBlurb | default">
+      </span>
+      <div class="description">
+        Some text about the hosting site for the back of the book. In exact plain text.
+      </div>
+    </div>
+
+    <div class="authorblurb">
+      <span class="field">Author blurb:</span>
+      <span class="data" tal:content="default">--not implemented--</span>
+      <div class="description">
+        Author information for the back of the book.
+      </div>
+    </div>
+
+    <div class="licenseurl">
+      <span class="field">License URL:</span>
+      <span class="data" tal:content="context/license">True</span>
+      <div class="description">
+        URL for the license (probably Creative Commons)
+      </div>
+    </div>
+
+    <div class="versiondate" tal:condition="nothing">
+      <span class="field">Version Date:</span>
+      <span class="data" tal:content="context/version">1/1/1 1:11:11</span>
+      <div class="description">
+        Date this version of the collection was published. Does not include publication of contained modules.
+      </div>
+    </div>
+
+</tal:extended>
+
+  </body>
+</html>

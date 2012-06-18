@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<div  tal:omit-tag=""
+      tal:define="course context/nearestCourse | context"
+      xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+<html lang="en-US"
+      metal:use-macro="here/module_template/macros/master">
+  <head>
+
+    <script type="text/javascript" src="/transmenus/transMenus0_9_2.js"
+            tal:attributes="href string:$portal_url/transmenus/transMenus0_9_2.js"
+            metal:fill-slot="javascript_head_slot"></script>
+
+    <metal:css metal:fill-slot="css_slot">
+     <link rel="stylesheet" href="/content_browse.css" type="text/css" title="Search" media="screen"
+           tal:attributes="href string:$portal_url/content_browse.css" />
+     <link rel="stylesheet" href="/transmenus/basic.css" type="text/css" title="Default" media="screen"
+           tal:attributes="href string:$portal_url/transmenus/basic.css" />
+     <!--[if IE]>
+       <style type="text/css">@import url(collection_composer_ie.css);</style>
+     <![endif]-->
+     <link rel="annotations" tal:attributes="href string:${course/absolute_url}/annotations" />
+    </metal:css>
+
+  </head>
+
+  <body>
+
+    <metal:block metal:fill-slot="super" tal:condition="show_border"
+                 tal:define="actions python:here.portal_actions.listFilteredActionsFor(course);">
+      <div metal:use-macro="here/global_contentviews/macros/content_views">The content views</div>
+      <div metal:use-macro="here/global_contentviews/macros/content_actions">The content bar</div>
+    </metal:block>
+
+    <div metal:fill-slot="main">
+
+    <div style="padding-bottom: 0.5em;" class="importexport">
+        <table style="margin: 0pt; padding: 0pt;">
+        <tbody>
+            <tr style="font-size: 90%; vertical-align: top;">
+                <td>
+                    <h5 i18n:translate="export">EXPORT</h5>
+                    <span i18n:translate="export_help">
+                        Download a collection file to your computer for external use.
+                    </span>
+                    <a tal:attributes="href string:${portal_url}/help/authoring/import-export#exportcollection">
+                        (<span i18n:translate="whats_this">What's this?</span>)
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form tal:attributes="action string:${context/absolute_url}/source_download"
+                          style="display: inline;">
+                        <input i18n:attributes="value export_collection_xml"
+                               type="submit" value="Export Collection XML" name="export" class="context">
+                    </form>
+                </td>
+            </tr>
+
+        </tbody>
+        </table>
+    </div>
+
+    <div i18n:translate="">
+        <b>Note</b>: Editing and re-importing of the Collection XML is not supported at this time.  
+    </div>
+
+    </div>
+  </body>
+</html>
+
+</div>

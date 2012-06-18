@@ -1,0 +1,3 @@
+#archetypes-fieldname-keywords textarea {
+    width: 50%;
+}

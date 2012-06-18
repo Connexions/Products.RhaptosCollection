@@ -1,0 +1,86 @@
+#mainMenu {
+	position:absolute;
+	top:15px;
+	left:15px;
+	padding:0px;
+	margin:0px;
+}
+#mainMenu li {
+	list-style-image:none;
+	list-style-type:none;
+}
+#mainMenu a, #mainMenu a:active, #mainMenu a:visited {
+	color:#999;
+	text-decoration:none;
+}
+#mainMenu a:hover {
+	color:#660000;
+}
+#popUpDemo {
+	width:350px;
+	height:15px;
+	margin:0px;
+	padding:2px;
+	list-style-type:none;
+	border:1px solid #666;
+}
+#popUpDemo li {
+	display:inline;
+	margin:0px 15px 0px 0px;
+	padding:1px;
+	font:10px Verdana, Geneva, sans-serif;
+}
+#popUpDemo .popUpMenu  {
+	background-color:#FFF;
+	border:1px solid #666;
+	display:none;
+	visibility:hidden;
+	z-index:100;
+	margin:0px;
+	padding:2px;
+}
+#popUpDemo .popUpMenu li {
+	display:list-item;
+	list-style-type:none;
+	list-style-image:none;
+}
+
+#collapsibleDemo {
+    margin-left:0px;
+    padding-left:0px;
+}
+
+#collapsibleDemo li {
+	list-style-type:none;
+	margin-bottom:2px;
+	margin-top:0px;
+    padding-right:0px;
+    padding-left:0px;
+    padding: 3px;
+}
+
+#collapsibleDemo li span {
+    margin-left:-0.6ex;
+}
+
+#collapsibleDemo li ul {
+	list-style-type:none;
+	margin-bottom:2px;
+	margin-top:2px;
+    margin-left: 18px;
+}
+#I_A {
+	width:250px;
+}
+#I_A_1 {
+	width:300px;
+}
+#II_A {
+	width:250px;
+}
+#II_A_2 {
+	width:175px;
+}
+#II_A_5 {
+	width:300px;
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      i18n:domain="rhaptos"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:define="dummy python:request.RESPONSE.setHeader('Content-Type', 'text/html;;charset=utf-8')">
+  <head>
+    <title>Collection Status</title>
+    <script type="text/javascript" src="/plone_javascript_variables.js"> </script>
+    <script type="text/javascript" src="/register_function.js"> </script>
+    <script type="text/javascript" src="/table_sorter.js"> </script>
+    <style type="text/css">
+    table.listing {
+            border-collapse: collapse;
+            background-color: white;
+    }
+    table.listing th {
+            font-size: 80%;
+            border: thin solid gray;
+            padding: 3px;
+            white-space: nowrap
+    }
+    table.listing td {
+            border: thin solid gray;
+            padding: 3px;
+    }
+    table.listing td.bool {
+            text-align: center
+    }
+    a.specorder {
+            font-size: 80%
+    }
+    td.datecell {
+            font-size: 80%;
+            white-space: nowrap
+    }
+    </style>
+</head>
+  
+  <body>
+    <table class="listing">
+      <thead>
+        <th>objectId</th>
+        <th>version</th>
+        <th>Title</th>
+        <th>Process Status</th>
+        <th>PDF avail?</th>
+        <th>ZIP avail?</th>
+        <th>Orderable?</th>
+        <th>Last Printed</th>
+        <th>Special order URL</th>
+      </thead>
+      <tr tal:repeat="brain python:context.content.catalog(portal_type='Collection', sort_on='objectId')">
+        <tal:inner define="col brain/getObject;
+                           objectId brain/objectId;
+                           version brain/version;
+                           ptool context/rhaptos_print">
+          <td tal:content="objectId">col10000</td>
+          <td tal:content="version">1.1</td>
+          <td>
+            <a href="" style="color: black; text-decoration: none"
+              tal:content="brain/Title"
+              tal:attributes="href string:${here/portal_url}/content/${brain/objectId}/latest/">
+              I am the very model of a modern major general</a>
+          </td>
+          <td tal:content="col/getProcessStatus">locked</td>
+          <td tal:define="pfile col/getPrintedFile;
+                          pdfexists python:pfile and pfile.get_size()"
+              tal:content="python:pdfexists and True or '-'" class="bool">True</td>
+          <td tal:define="doesCompleteExist python:ptool.doesFileExist(objectId, version, 'complete.zip');"
+              tal:content="python:doesCompleteExist and True or '-'" class="bool">False</td>
+          <td tal:define="orderable col/getOrderable"
+              tal:content="python:orderable and True or '-'" class="bool">True</td>
+          <td class="datecell"
+              tal:content="python:col.getLastPrinted() and col.getLastPrinted().strftime('%D %H:%m') or '-'">06/17/08 13:06</td>
+          <td tal:define="buyLink col/buyLink | nothing">
+            <a href=""
+               tal:content="python: buyLink or '-'"
+               tal:omit-tag="not:buyLink"
+               tal:attributes="href buyLink"
+               class="specorder">None</a>
+          </td>
+        </tal:inner>
+      </tr>
+    </table>
+
+  </body>
+</html>

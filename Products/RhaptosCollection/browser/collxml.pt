@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<collection xmlns="http://cnx.rice.edu/collxml"
+            xmlns:cnx="http://cnx.rice.edu/cnxml"
+            xmlns:cnxorg="http://cnx.rice.edu/system-info"
+            xmlns:md="http://cnx.rice.edu/mdml"
+            xmlns:col="http://cnx.rice.edu/collxml"
+            xmlns:cnxml="http://cnx.rice.edu/cnxml"
+            xmlns:m="http://www.w3.org/1998/Math/MathML"
+            xmlns:q="http://cnx.rice.edu/qml/1.0"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:bib="http://bibtexml.sf.net/"
+            xmlns:cc="http://web.resource.org/cc/"
+            xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:metal="http://xml.zope.org/namespaces/metal"
+            xmlns:tal="http://xml.zope.org/namespaces/tal"
+            xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+            xml:lang="en"
+            tal:define="portal context/portal_url/getPortalObject;
+                        repos view/repository | portal/content/absolute_url;
+                        type view/coltype"
+            tal:attributes="type python:type or nothing">
+  <metadata tal:define="metadata nocall:context/metadata;
+                        dummy python:metadata.set_repository(repos)"
+            tal:replace="structure metadata">
+  </metadata>
+  <parameters tal:define="parameters view/parameters"
+              tal:condition="parameters">
+    <param name="realimaginarynotation" value="text"
+           tal:repeat="paramitem parameters/items"
+           tal:attributes="name python:paramitem[0];
+                           value python:paramitem[1]" />
+  </parameters>
+  <featured-links tal:replace="nothing">
+  </featured-links>
+  <content tal:define="colstruc view/content_structure;
+                       elts colstruc">
+    <tal:levelmacro metal:define-macro="level"
+                    tal:repeat="elt elts">
+      <module document="m54321" version="1.1" repository="http://cnx.org/content"
+              cnxorg:version-at-this-collection-version="2.3"
+              tal:condition="not:elt/container"
+              tal:attributes="document elt/id;
+                              version elt/version;
+                              repository repos;
+                              cnxorg:version-at-this-collection-version elt/reposversion | string:fail">
+        <md:title tal:content="elt/title">In Brief</md:title>
+        <md:short-title tal:replace="nothing">In Briefer</md:short-title>
+        <parameters uses="dummy"
+                    tal:replace="nothing">
+          <param name="dummy" value="dummy"/>
+        </parameters>
+        <featured-links tal:define="links elt/links;
+                                    linkgroups python:links.items()"
+                        tal:condition="links">
+          <tal:loop tal:repeat="linkgroup linkgroups">
+            <cnx:link-group type="example"
+                            tal:define="category python:linkgroup[0];
+                                        links python:linkgroup[1]"
+                            tal:attributes="type category">
+              <cnx:link url="http://example.com"
+                        tal:repeat="link links"
+                        tal:content="link/title"
+                        tal:attributes="url link/url">
+                Link text
+              </cnx:link>
+            </cnx:link-group>
+          </tal:loop>
+        </featured-links>
+      </module>
+        
+      <subcollection tal:define="elts elt/children | nothing"
+                      tal:condition="elt/container">
+        <md:title tal:content="elt/title">Stalking the Wild Crunchberry</md:title>
+        <md:short-title tal:replace="nothing">Wild Crunchberries</md:short-title>
+        <parameters uses="dummy"
+                    tal:replace="nothing">
+          <param name="dummy" value="dummy"/>
+        </parameters>
+        <featured-links display-on-children="false"
+                        tal:replace="nothing">
+          <cnx:link-group type="example">
+            <cnx:link url="http://example.com">...</cnx:link>
+          </cnx:link-group>
+        </featured-links>
+
+        <content>
+          <metal:children metal:use-macro="template/macros/level" />
+        </content>
+      </subcollection>
+    </tal:levelmacro>
+  </content>
+</collection>

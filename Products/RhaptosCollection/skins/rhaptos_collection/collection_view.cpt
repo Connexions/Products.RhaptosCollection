@@ -1,0 +1,883 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xml:lang="en-US" lang="en-US"
+      metal:use-macro="context/content_template/macros/master"
+      i18n:domain="rhaptos">
+  <head>
+    <metal:block metal:fill-slot="js_slot">
+        <script type="text/javascript" src="/rhaptosutils.js"
+                tal:attributes="src string:$portal_url/rhaptosutils.js"></script>
+        <script type="text/javascript" src="/js/toggler.js"
+                tal:attributes="src string:$portal_url/js/toggler.js"></script>
+        <script type="text/javascript" src="/extjs/ext.js"
+                tal:attributes="src string:$portal_url/extjs/ext.js"></script>
+        <script type="text/javascript" src="/js/dynamic.js"
+                tal:attributes="src string:$portal_url/js/dynamic.js"></script>
+        <script type="text/javascript" src="/transmenus/transMenus0_9_2.js"
+                tal:attributes="src string:$portal_url/transmenus/transMenus0_9_2.js"></script>
+        <script type="text/javascript" src="/transmenus/toc.js"
+                tal:attributes="src string:$portal_url/transmenus/toc.js"></script>
+        <!-- login.js only needed when opening lens dialog when anonymous. dynamic load
+             would be nice, if someone can figure out how. See lens_add near portlet_log macro -->
+        <script type="text/javascript" src="/register_function.js"
+                tal:attributes="src string:$portal_url/register_function.js"></script>
+        <script type="text/javascript" src="/login.js"
+                tal:attributes="src string:$portal_url/login.js"></script>
+        <tal:comment replace="nothing"> The following is used globally by javascript to get the portal_url</tal:comment>
+        <script type="text/javascript" tal:content="string:var portal_url='${portal_url}';"></script> 
+        <script type="text/javascript"
+                tal:attributes="src string:$portal_url/extjs/adapter/jquery/jquery.js"></script>
+        <script type="text/javascript"
+                tal:attributes="src string:$portal_url/extjs/adapter/jquery/jquery-plugins.js"></script>
+        <script type="text/javascript"
+                tal:attributes="src string:$portal_url/lightweight-branding-banner.js"></script>
+    </metal:block>
+    
+    <tal:comment replace="nothing">
+      The following Open Graph (og) protocol tags are for the Facebook button so that the 
+      content shows up nicely when posted to a Facebook wall.
+    </tal:comment>
+    <metal:block metal:fill-slot="facebook_open_graph_slot" tal:condition="python:here.state=='public'">
+      <meta property="og:title" tal:attributes="content context/Title" />
+      <meta property="og:type" content="book" />
+      <tal:comment replace="nothing">
+        The book icon should probably not be used for Rhaptos installs, but for now it's better 
+        than nothing (or than letting Facebook randomly pick an image for you).
+      </tal:comment>
+      <meta property="og:image" tal:attributes="content string:$portal_url/book_icon_cnx.png" />
+      <meta property="og:url" 
+            tal:define="objectId here/objectId | nothing"
+            tal:attributes="content string:$portal_url/content/$objectId/latest/" />
+      <meta property="og:site_name" tal:attributes="content portal/title" />
+      <tal:comment replace="nothing">
+        The fb:admins content value is a special user ('Rhaptos McCrouton') made specifically 
+        to populate this property, since it's required. 
+      </tal:comment>
+      <meta property="fb:admins" content="100002202416123" />
+      <meta tal:define="isCNX context/isCNX | nothing"
+            tal:condition="isCNX"
+            property="fb:page_id" content="81379287964" />
+      <meta tal:condition="context/abstract" property="og:description" 
+            tal:attributes="content context/abstract_text" />
+    </metal:block>
+
+    <metal:block metal:fill-slot="css_above_slot">
+      <link rel="stylesheet" type="text/css" href="/extjs/resources/css/ext-all.css"
+            tal:attributes="href string:$portal_url/extjs/resources/css/ext-all.css"/>
+    </metal:block>
+    
+    <metal:block metal:fill-slot="css_slot">
+      <link tal:condition="python:here.state == 'public'" rel="roadmap"
+            tal:attributes="href string:${here/url}/?format=rdf" />
+      <link tal:condition="python:here.state != 'public'" rel="roadmap"
+            tal:attributes="href string:${here/url}/preview?format=rdf" />
+    </metal:block>
+  </head>
+      
+  <body metal:fill-slot="body_slot" id="cnx_course" onload="togglerInitialSettings()"
+        tal:define="parameters context/getParameters;
+                    shorttype python:context.getCollectionType(display='short') or 'Collection';
+                    fulltype python:context.getCollectionType(display='full');
+                    objectId context/objectId | nothing;
+                    version context/version | nothing;
+                    public context/isPublic;
+                    pfile context/getPrintedFile | nothing;
+                    printable python:pfile and pfile.get_size();
+                    ltool context/lens_tool | nothing;
+                    cats python:ltool and objectId and ltool.getListsIncluding(objectId, version) or {};
+                    virtualPath python:request.get('VIRTUAL_URL_PARTS',(None,None))[1]; 
+                    virtualPath python:virtualPath and '/%s' % virtualPath; 
+                    regularPath request/environ/PATH_INFO;
+                    actionPath python:virtualPath or regularPath;
+                    pathVersion python:actionPath.split('/')[-1] or actionPath.split('/')[-2];
+                    absurl context/absolute_url;
+                    currentPath python:absurl.split('/');
+                    latestURL python:public and '/'.join(currentPath[:-1]+['latest']) or None;
+                    versionURL python:public and '/'.join(currentPath[:-1]+[version]) or None;
+                    collection context/collection | python:public and '/'.join(regularPath.rstrip('/').split('/')[-2:]) or 'preview';
+                    gaPDFLink string:pageTracker._trackPageview('$versionURL/pdf');
+                    twistdict context/twistydetect;
+                    all_namespacetags_li python:[];
+                    utool nocall:here/portal_url;
+                    portalPath utool/getPortalPath;">
+
+    <tal:recentview define="dummy python:context.setrecentview('viewed_cols', objectId, version)" />
+
+    <p class="hiddenStructure">
+      <a href="#cnx_content_title" i18n:translate="label_skip_to_content">Skip to content</a>
+      <a href="#cnx_sidebar_column" i18n:translate="label_skip_to_navigation">Skip to navigation</a>
+    </p>
+
+    <div metal:use-macro="context/content_template/macros/global" />
+
+    <tal:branding-banner
+        tal:repeat="branding cats/values">
+      <tal:lens tal:repeat="lensdict branding/items">
+        <tal:hasBranding tal:condition="python:lensdict[1][0]['banner'] == 'true'">
+          <div class="cnx_branding_banner" style=""
+              tal:define="
+                  lensInfo                python:lensdict[1][0];
+                  brandingColor           python:lensInfo.get('bannerColor', None);
+                  brandingForegroundColor python:lensInfo.get('bannerForegroundColor', None);
+                  brandingCategory        python:lensInfo.get('category', None);
+                  brandingLocation        python:lensInfo.get('location', None);
+                  brandingTitle           python:lensInfo.get('title', None);
+                  visibility              python:lensInfo.get('permanent',None) and 'visible' or 'none';
+                  bannerStyle             python:'display: '+ visibility +';; background-color:#' + 
+                                                  brandingColor + ';; ' + 'color:#' + brandingForegroundColor + ';;' ;
+                  linkStyle               python:'color:#' + brandingForegroundColor + ';;';"
+              tal:attributes="style bannerStyle" >
+            <tal:banner-message
+                tal:condition="python:brandingCategory=='Endorsement'">Content endorsed by:
+            </tal:banner-message>
+            <tal:banner-message
+                tal:condition="python:brandingCategory=='Affiliation'">Content affiliated with:
+            </tal:banner-message>
+            <tal:banner-message
+                tal:condition="python:brandingCategory!='Endorsement' and brandingCategory!='Affiliation'">Content included in lens:
+            </tal:banner-message>
+            <a href="" style=""
+                tal:attributes="href  brandingLocation;
+                                style linkStyle"
+                tal:content="brandingTitle" />
+          </div>
+        </tal:hasBranding>
+      </tal:lens>
+    </tal:branding-banner>
+
+    <div id="cnx_columns">
+
+    <div id="cnx_sidebar_column"
+         tal:define="styles options/styles | python:here.getStyles();
+                     styleLoc python:'/'.join(styles[0]['path'].split('/')[:-1]);
+                     anon context/portal_membership/isAnonymousUser;">
+
+      <tal:branding-logos tal:repeat="branding cats/values">
+        <tal:logo tal:repeat="lensdict branding/items">
+          <div class="cnx_branding_logo" style="display: none;"
+              tal:define="
+                  lensInfo          python:lensdict[1][0];
+                  brandingLogo      python:lensInfo['logo'] == 'true' and lensInfo['location']+'/logo' or None;
+                  brandingLocation  python:lensInfo['location'];
+                  visibility        python:lensInfo.get('permanent',None) and 'visible' or 'none';
+                  brandingTitle     python:lensInfo['title'];"
+              tal:condition="python:brandingLogo"
+              tal:attributes="style string:display: $visibility">
+            <a href="" tal:attributes="href  brandingLocation;">
+              <img src="" alt=""
+                  tal:attributes="src  brandingLogo;
+                                  alt  brandingTitle" />
+            </a>
+          </div>
+        </tal:logo> 
+      </tal:branding-logos>
+
+      <h2 class="hiddenStructure" i18n:translate="heading_navigation">Navigation</h2>
+
+      <div class="portletContainer" id="cnx_course_content">
+        <dl class="portlet"
+            tal:define="navcookie twistdict/cnx_course_navigation | nothing">
+          <dt class="portletHeader">
+            <span class="portletTopLeft"></span>
+            <span><h3>
+              <a href="#cnx_course_navigation_contents"
+                 onclick="twist_toggle('cnx_course_navigation'); return false;"
+                 title="Click to toggle the Table of Contents open and closed"
+                 i18n:attributes="title">
+                <span i18n:translate="heading_table_of">Table of </span>
+                <span style="white-space: nowrap" i18n:translate="header_contents">Contents</span>
+                <img id="cnx_course_navigation_collapse" alt=""
+                     tal:attributes="src string:$styleLoc/arrow-open.png;
+                                     style python:test(navcookie and navcookie!='none', 'display: inline;;', 'display: none;;');" />
+                <img id="cnx_course_navigation_expand" alt=""
+                     tal:attributes="src string:$styleLoc/arrow-closed.png;
+                                     style python:test(navcookie and navcookie=='none', 'display: inline;;', 'display: none;;');" />
+              </a>
+            </h3></span>
+            <span class="portletTopRight"></span>
+          </dt>
+          <dd class="portletItem odd">
+            <div id="cnx_course_navigation_contents"
+                 tal:attributes="style python:test(navcookie=='none', 'display: none;;', None);">
+              <div id="course" path="/content"
+                   tal:attributes="path default | actionPath">
+                <div tal:define="dummy python:request.set('collection', collection)" 
+                     tal:replace="structure python:portal.toc_structure(here)" />
+              </div>
+            </div>
+          </dd>
+        </dl>
+      </div>
+    
+      <tal:has_lenses define="aview nocall:context/@@lensmaker.reviewlist.lenses;
+                              lenses python:aview()">
+        <div class="portletContainer" id="cnx_endorse_module"
+             tal:condition="lenses">
+            <dl class="portlet">
+              <dt class="portletHeader">
+                <span class="portletTopLeft"> </span>
+                <span><h3>Approve Collection</h3></span>
+                <span class="portletTopRight"> </span>
+              </dt>
+              <dd class="portletItem odd">
+                <h4>Select the lenses where this collection should be approved:</h4>
+                <form method="post" action=""
+                      tal:attributes="action string:${context/absolute_url}/@@lensmaker.reviewlist.approve">
+                  <ul>
+                  <tal:lenses repeat="lens lenses">
+                    <li>
+                    <input name="paths:list"
+                           tal:attributes="value string:${lens/getPath}/${context/objectId}"
+                           type="checkbox"
+                           class="noborder" />
+                      <a tal:attributes="href lens/getURL">
+                        <tal:title replace="lens/getDisplayName" />
+                      </a>
+                    </li>
+                  </tal:lenses>
+                  </ul>
+                  <input class="searchButton" type="submit" value="Approve" />
+                </form>
+              </dd>
+            </dl>
+        </div>
+      </tal:has_lenses>
+
+      <div class="portletContainer" id="cnx_lens_info"
+           tal:condition="cats">
+        <dl class="portlet">
+          <dt class="portletHeader">
+            <span class="portletTopLeft"></span>
+            <span><h3 i18n:translate="heading_lenses">Lenses</h3></span>
+            <span class="portletTopRight"></span>
+          </dt>
+          <dd class="portletItem odd">
+            <div class="lensinfowrap">
+              <p id="cnx_what_is_a_lens">
+                <a href="/help/viewing/lenses"
+                   i18n:translate="text_what_lens"
+                   class="lenslink"
+                   tal:define="help nocall:portal/help/viewing/lenses | nothing" tal:condition="nocall:help"
+                   tal:attributes="href help/absolute_url">What is a lens?
+                </a>
+              </p>
+              <tal:block metal:define-macro="lenshelp">
+              <div class="lensinfo hiddenStructure">
+                <h4 class="hiddenStructure" 
+                    i18n:translate="header_definition_of_lens">Definition of a lens</h4>
+                <img src="/lenses-large.png" class="lensinfologo" alt="Diagram of lenses" i18n:attributes="alt" />
+                <h5 i18n:translate="header_lenses">Lenses</h5>
+                <p i18n:translate="text_lenses_para">A lens is a custom 
+                  view of the content in the repository.  You can think of it as a 
+                  fancy kind of list that will let you see content 
+                  through the eyes of organizations and people you 
+                  trust.
+                </p>
+                <h5 i18n:translate="header_what_in_lens">What is in a lens?</h5>
+                <p i18n:translate="text_what_lens_para">Lens makers 
+                  point to materials (modules and 
+                  collections), creating a guide that includes their own 
+                  comments and descriptive tags about the content.
+                </p>
+                <h5 i18n:translate="header_who_lens">Who can create a lens?</h5>
+                <p i18n:translate="text_who_lens_para">Any individual 
+                  member, a community, or a respected 
+                  organization.
+                </p>
+                <h5>
+                  <span i18n:translate="header_what_tags">What are tags?</span>
+                  <img src="/tags.png" class="tagicon" alt="tag icon" i18n:attributes="alt" />
+                </h5>
+                <p i18n:translate="text_what_tags_para">Tags are descriptors 
+                  added by lens makers to help label content, attaching a 
+                  vocabulary that is meaningful in the context of the lens.
+                </p>
+              </div>
+              </tal:block>
+              <tal:block metal:define-macro="openlenshelp">
+              <div class="lensinfo hiddenStructure">
+                <h4 class="hiddenStructure" 
+                    i18n:translate="header_definition_of_open_lens">Definition of an open lens</h4>
+                <p i18n:translate="text_open_lenses_para">
+                  Any member is allowed to add content to an open
+                  lens, even if the lens belongs to someone else. You can
+                  think of open lenses as lists of similar works related
+                  to the same subject, authored by various collaborating
+                  organizations or members. Content added to open lenses
+                  is reviewed for approval or deletion from the lens.
+                </p>
+              </div>
+              </tal:block>
+            </div>
+            <h4 id="cnx_this_content_is_ellipsis" i18n:translate="header_this_content_is">This content is ...</h4>
+            <tal:block tal:define="cat cats/Endorsement | nothing;"
+                       tal:condition="cat">
+              <div class="lensinfowrap">
+                <h4>Endorsed by 
+                  <img src="/endorsed.gif" alt="Endorsed" i18n:attributes="alt"/> 
+                  <a href="/help/glossary#endorsement" class="lenslink">(<span 
+                       class="hiddenStructure" i18n:translate="text_what_endorsement_means">What does "Endorsed by" mean</span>?)</a>
+                </h4>
+                <span class="lensinfo hiddenStructure" i18n:translate="text_endorsement_explanation">
+                  This content has been endorsed by the organizations 
+                  listed. Click each link for a list of all content 
+                  endorsed by the organization.
+                </span>
+              </div>
+              <ul id="cnx_endorsements_expanded"
+                  tal:define="lists cat/values">
+                <li class="lensinfowrap"
+                    tal:repeat="l lists">
+                  <tal:block metal:define-macro="lenslisting"
+                             tal:define="list python:l[0];
+                                         entries python:l[1];
+                                         category list/category;
+                                         link list/location;">
+                    <tal:entries repeat="e entries">
+                      <tal:span define="namespaceTags e/namespaceTags|python:[];
+                                        tags python:[t for t in e['tags'].split(' ') if t];
+                                        li python:context.restrictedTraverse('@@objectifyTagNamespaceList')(
+                                            namespaceTags, lens_path=portalPath+list['location']);
+                                        dummy python:all_namespacetags_li.extend(li)">
+                        <a href="#" class="lenslink"
+                          tal:content="list/displayName"
+                          tal:attributes="href link">
+                          displayName
+                        </a>
+                        <img src="/private.gif"
+                          tal:condition="python:(list['state']=='private' or list['state']=='private_open') and category!='Favorites'"
+                          alt="Private lens key" 
+                          title="Private lens: seen only by lens maker while logged on"
+                          i18n:attributes="alt; title" />
+                        <span tal:condition="python:tags or li">
+                            <span class="tagicon" onclick="toggleLensTags(this);">
+                              <img src="/tags-closed.png"
+                                   tal:attributes="src string:$portal_url/tags-closed.png"
+                                   alt="display tags" 
+                                   title="Click to display tags" 
+                                   i18n:attributes="alt; title"/>
+                              <img src="/tags-open.png" 
+                                   tal:attributes="src string:$portal_url/tags-open.png"
+                                   alt="hide tags" 
+                                   title="Click to hide tags" 
+                                   i18n:attributes="alt; title"
+                                   style="display: none;"/>
+                            </span>
+                            <div class="lenstags" style="display: none;">
+                              <strong i18n:translate="label_tags">Tags</strong>
+                              <tal:span condition="not:anon">
+                                <a tal:define="state list/state;"
+                                   tal:condition="python:state=='published_open' or state=='private_open'"
+                                   tal:attributes="href string:${here/url}/lens_add_tags?lens_paths:list=$portalPath${link}">
+                                  <img src="/pencil_cnx.png" alt="Edit tags" title="Edit tags"
+                                       tal:attributes="src string:$portal_url/pencil_cnx.png"
+                                       i18n:attributes="alt; title" />
+                                </a>
+                              </tal:span>
+                              <ul class="cnx_tag_listing">
+                                <tal:repeat repeat="tag tags">
+                                  <li>
+                                    <a tal:attributes="href string:${link}/lens_view/${tag};
+                                                       title tag;"
+                                       tal:content="tag">[dsp]</a>
+                                  </li>
+                                </tal:repeat>
+                                <tal:repeat repeat="di li">
+                                  <tal:tags tal:repeat="tag di/tags">
+                                    <li tal:define="title python:context.restrictedTraverse('@@getNamespaceTagLabel')(tag);
+                                                    term python:context.restrictedTraverse('@@getNamespaceTagTerm')(prefix='', tag=tag);
+                                                    prefixed python:context.restrictedTraverse('@@getNamespaceTagTerm')(di['tagnamespace'].getPrefix(), tag);">
+                                      <a tal:attributes="href string:${link}/lens_view/${prefixed};
+                                                         title title;"
+                                         tal:content="term">[LO1]</a>
+                                    </li>
+                                  </tal:tags>
+                                </tal:repeat>
+                              </ul>
+                            </div>
+                        </span>
+                        <div class="lensinfo hiddenStructure">
+                          <img src="list/logo" alt="Logo" class="lensinfologo"
+                            tal:condition="list/logo"
+                            tal:attributes="src string:${list/location}/logo_thumb" 
+                            i18n:attributes="alt" />
+                          <div>
+                            <span i18n:translate="text_collection_included_lens" class="lensinfohelp">
+                              This collection is included in
+                              <span i18n:name="a" 
+                                    i18n:translate="text_a"
+                                    tal:condition="python:list['title'] == list['creatorName']"
+                                    tal:content="string:a">a</span>
+                            </span>
+                            <tal:lensinfo condition="python:list['title'] != list['creatorName']">
+                              <strong i18n:translate="text_header_lens">
+                                Lens:
+                              </strong>
+                              <span class="lensinfotitle" 
+                                    tal:content="list/title">title</span>
+                              <br />
+                              <strong i18n:translate="text_header_by">
+                                By: 
+                              </strong>
+                              <tal:span tal:content="list/creatorName | nothing">Caesar Augustus</tal:span>
+                            </tal:lensinfo>
+                          </div>
+                          <div class="lensinfoapproval">
+                            <tal:lensapproval condition="python:list['title'] != list['creatorName']">
+                              <tal:review_status repeat="e entries"
+                                         condition="python:'_open' in list['state']">
+                                  <strong i18n:translate="text_header_review_status">
+                                    Review Status:
+                                  </strong>
+                                  <span tal:condition="e/approved">Approved</span>
+                                  <span tal:condition="not:e/approved">In Review</span>
+                              </tal:review_status>
+                            </tal:lensapproval>
+                          </div>
+                          <p>
+                            <tal:block tal:condition="python:list['title'] == list['creatorName']">
+                              <strong i18n:translate="text_header_lens_by">
+                                Lens by:
+                              </strong>
+                              <span class="lensinfotitle"
+                                    tal:content="list/creatorName | nothing">Caesar Augustus</span>
+                            </tal:block>
+                          </p>
+                          <tal:block tal:repeat="e entries">
+                            <tal:block tal:condition="e/comment">
+                              <strong>Comments:</strong>
+                              <p i18n:translate="text_header_lens_comments">
+                                <span class="lensinfocomments"
+                                  i18n:name="lens_comments">
+                                  "<tal:data tal:content="python:here.truncate(e['comment'], 200)">I'm a comment</tal:data>"
+                                </span>
+                              </p>
+                            </tal:block>
+                          </tal:block>
+                          <p tal:condition="python:category=='Endorsement'" i18n:translate="text_endorsement_click" class="lensinfohelp">
+                            Click the 
+                            <span i18n:name="lensDisplayName">
+                              <strong i18n:translate="text_lens_name_quoted">
+                                "<span tal:content="list/displayName" i18n:name="lensDisplayName">displayName</span>"
+                              </strong>
+                            </span>
+                            link to see all content they endorse.
+                          </p>
+                          <p tal:condition="python:category=='Affiliation'" i18n:translate="text_affiliation_click" class="lensinfohelp">
+                            Click the 
+                            <span i18n:name="lensDisplayName">
+                              <strong i18n:translate="text_lens_name_quoted">
+                                "<span tal:content="list/displayName" i18n:name="lensDisplayName">displayName</span>"
+                              </strong>
+                            </span>
+                            link to see all content affiliated with them.
+                          </p>
+                          <p tal:condition="python:category=='List' or category=='Favorites'" i18n:translate="text_list_click" class="lensinfohelp">
+                            Click the 
+                            <span i18n:name="lensDisplayName">
+                              <strong i18n:translate="text_lens_name_quoted">
+                                "<span tal:content="list/displayName" i18n:name="lensDisplayName">displayName</span>"
+                              </strong>
+                            </span>
+                            link to see all content selected in this lens.
+                          </p>
+                          <p tal:condition="python:tags or li" i18n:translate="text_tags_click" class="lensinfohelp lensinfotags">
+                            Click the
+                            <span i18n:name="tagicon">
+                              <strong>
+                                <img src="/tags-closed.png" class="tagicon" alt="tag icon" 
+                                     i18n:attributes="alt"/>
+                                <span i18n:translate="text_tag_icon">tag icon</span>
+                              </strong>
+                            </span>
+                            to display tags associated with this content.
+                          </p>
+                        </div>
+                      </tal:span>
+                    </tal:entries>
+                  </tal:block>
+                </li>
+              </ul>
+            </tal:block>
+            <tal:block tal:define="cat cats/Affiliation | nothing"
+                       tal:condition="cat">
+                <div class="lensinfowrap">
+                  <h4>Affiliated with
+                    <a href="/help/glossary#affiliation" class="lenslink">(<span
+                         class="hiddenStructure" i18n:translate="text_what_affiliation_means">What does "Affiliated with" mean</span>?)</a>
+                  </h4>
+                  <span class="lensinfo hiddenStructure" i18n:translate="text_affiliation_explanation">
+                    This content is either by members of the 
+                    organizations listed or about topics related to 
+                    the organizations listed. Click each link to see a 
+                    list of all content affiliated with the 
+                    organization.
+                  </span>
+                </div>
+              <ul id="cnx_affiliations_expanded"
+                  tal:define="lists cat/values">
+                <li class="lensinfowrap"
+                    tal:repeat="l lists">
+                  <tal:block metal:use-macro="template/macros/lenslisting">...</tal:block>
+                </li>
+              </ul>
+            </tal:block>
+
+            <tal:x tal:define="othercats python:dict([item for item in cats.items() if item[0] not in ('Endorsement', 'Affiliation')]);
+                               othertypes python:cats.has_key('Endorsement') or cats.has_key('Affiliation')"
+                   tal:condition="othercats">
+              <h4 tal:condition="othertypes" i18n:translate="text_also_in_lenses">Also in these lenses</h4>
+              <h4 tal:condition="not:othertypes" i18n:translate="text_in_lenses">In these lenses</h4>
+              <ul id="cnx_otherlenscats_expanded">
+                <tal:loop tal:repeat="catitem othercats/items">
+                  <tal:block tal:define="cat python:catitem[1];
+                                         lists cat/values;"
+                             tal:repeat="l lists">
+                    <li class="lensinfowrap"
+                        tal:define="list python:l[0];
+                                    category list/category;
+                                    favs python:category=='Favorites' or None"
+                        tal:attributes="class python:test(favs, 'lensinfowrap cnx_favorites', 'lensinfowrap')">
+                      <tal:block metal:use-macro="template/macros/lenslisting">...</tal:block>
+                    </li>
+                  </tal:block>
+                </tal:loop>
+              </ul>
+            </tal:x>
+          </dd>
+        </dl>
+      </div>
+
+      <div class="portletContainer" id="cnx_recent_viewed"
+           tal:define="navcookie twistdict/cnx_recentview | nothing">
+        <dl class="portlet">
+          <dt class="portletHeader">
+            <span class="portletTopLeft"></span>
+            <span>
+              <!-- Recently Viewed -->
+              <h3><a href="#cnx_recentview_contents" id="cnx_recentview_header"
+                     onclick="twist_toggle('cnx_recentview'); return false;">
+                <span i18n:translate="heading_recently">Recently</span>
+                <span style="white-space: nowrap;">
+                  <span i18n:translate="heading_viewed">Viewed</span>
+                  <img id="cnx_recentview_collapse" alt=""
+                       tal:attributes="src string:$styleLoc/arrow-open.png;
+                                       style python:test(navcookie and navcookie!='none', 'display: inline;;', 'display: none;;');" />
+                  <img id="cnx_recentview_expand" alt=""
+                       tal:attributes="src string:$styleLoc/arrow-closed.png;
+                                       style python:test(navcookie and navcookie=='none', 'display: inline;;', 'display: none;;');" />
+                </span>
+              </h3>
+            </span>
+            <span class="portletTopRight"></span>
+          </dt>
+          <dd class="portletItem odd">
+            <div id="cnx_recentview_contents">This feature requires Javascript to be enabled.</div>
+          </dd>
+        </dl>
+      </div>
+
+      <div class="portletContainer" id="cnx_tags"
+           tal:define="tags python:ltool.getTagsForContent(objectId, version)"
+           tal:condition="python:tags or all_namespacetags_li">
+        <dl class="portlet">
+          <dt class="portletHeader">
+            <span class="portletTopLeft"></span>
+            <span><h3 i18n:translate="heading_lenses">Tags</h3></span>
+            <span class="portletTopRight"></span>
+          </dt>
+          <dd class="portletItem odd">
+            <div class="lensinfowrap">
+              <p class="cnx_question_mark">
+                <a href="/help/glossary#tags" class="lenslink">(<span 
+                     class="hiddenStructure" i18n:translate="text_what_is_a_tag">What is a tag</span>?)</a>
+              </p>
+              <span class="lensinfo hiddenStructure" i18n:translate="text_tag_explanation">
+                These tags come from the endorsement, affiliation, and 
+                other lenses that include this content.
+              </span>
+            </div>
+            <ul class="cnx_tag_listing"
+                tal:define="li all_namespacetags_li">
+              <tal:span tal:repeat="tag tags">
+                <li>
+                  <a tal:attributes="href string:/tags_browse?tag=$tag;
+                                     title tag;" 
+                     tal:content="tag">dsp</a>
+                </li>
+              </tal:span>
+              <tal:span tal:repeat="di li">
+                <tal:span tal:repeat="tag di/tags">
+                  <li>
+                    <a tal:define="prefix python:di['tagnamespace'].getPrefix();
+                                   term python:context.restrictedTraverse('@@getNamespaceTagTerm')(prefix='', tag=tag);"
+                       tal:attributes="href string:$portalPath/lenses/tags_browse?prefix=$prefix&tag=$term;
+                                       title python:context.restrictedTraverse('@@getNamespaceTagLabel')(tag);"
+                       tal:content="python:context.restrictedTraverse('@@getNamespaceTagTerm')(prefix='', tag=tag)">[L01]</a>
+                  </li>
+                </tal:span>
+              </tal:span>
+            </ul>
+          </dd>
+        </dl>
+      </div>
+
+    </div>
+
+      <div id="cnx_content_column"
+           tal:define="actionsview python:context.bar_content_actions_view(module=None, collection=context,
+                                                                           objectId=objectId, version=version,
+                                                                           cats=cats)">
+        <div tal:condition="public"
+             tal:replace="structure python:context.bar_content_actions(view=actionsview)" />
+
+    <tal:block tal:define="latest_version here/aq_parent/latest/version | here/version;   
+			   not_latest python:here.getId() != 'latest' and here.version != latest_version;">
+      <div metal:use-macro="context/content_template/macros/header">
+        <metal:block metal:fill-slot="header_slot">
+          <div tal:condition="not_latest" class="cnx_warning">
+            <p class="cnx_warning_text">
+              <span class="cnx_before" i18n:translate="text_note_version_warning">Note:</span>
+              <span i18n:translate="text_old_version_warning">
+                You are viewing an old version of this content.  
+              </span>
+              <a href="../latest/" tal:attributes="href latestURL"
+                 i18n:translate="label_link_to_latest_version">The latest version is available here.</a>
+            </p>
+          </div>
+        </metal:block>
+          
+        <metal:block metal:fill-slot="before_title_slot">
+          <div tal:condition="python:here.state == 'public'" 
+               tal:define="url string:$portal_url/content/$objectId/latest/; 
+                           url_quote nocall:modules/Products.PythonScripts.standard/url_quote;
+                           escapedUrl python:url_quote(url);
+                           title context/Title;
+                           escapedTitle python:url_quote(title)"
+               class="cnx_social_media"
+               id="cnx_social_media_top"
+               style="display: none;">
+            <span class="cnx_facebook">
+              <iframe scrolling="no" frameborder="0" allowtransparency="true"
+                      tal:attributes="src string:http://www.facebook.com/plugins/like.php?href=$escapedUrl&amp;layout=button_count&amp;show_faces=false&amp;action=like&amp;colorscheme=light">
+              </iframe>
+            </span>
+            <span class="cnx_twitter">
+              <iframe scrolling="no" frameborder="0" allowtransparency="true" class="twitter-share-button twitter-count-horizontal" title="Tweet Button"
+                      tal:define="srcbase string:http://platform.twitter.com/widgets/tweet_button.html?count=horizontal&amp;lang=en&amp;text=${escapedTitle}&amp;url=${escapedUrl};
+                                  isCNX context/isCNX | nothing;
+                                  viastr python:isCNX and '&amp;via=cnxorg' or '';"
+                      tal:attributes="src string:${srcbase}${viastr}">
+              </iframe>
+            </span>
+          </div>
+          <img src="/book_icon_cnx.png" alt="Book icon" id="cnx_book_icon"
+               tal:attributes="herf string:$portal_url/book_icon_cnx.png" />
+        </metal:block>
+
+      </div>
+    </tal:block>
+
+    <div id="cnx_main" tal:define="all_modules here/containedModules">
+
+      <a id="cnx_order_link" onmousedown="try{var t=_gat._getTracker('UA-7903479-1'); t._initData(); t._setDomainName('.cnx.org'); t._trackPageview(window.location.pathname+'?event=collection:order');}catch(err){}"
+         tal:define="objectId context/objectId;
+                     all_modules context/containedModules;
+                     specialBuy context/buyLink | parameters/buyLink | context/aq_parent/buyLink | nothing;
+                     autoBuy context/portal_properties/rhaptos_collection_print_config/buyBookURLformat | nothing;
+                     autoBuy python:printable and autoBuy and autoBuy % objectId or None;
+                     buyURL python:specialBuy or autoBuy;
+                     interstitial string:$versionURL/collection_print_confirmation;
+                     buyLink python:specialBuy or interstitial"
+         tal:condition="python: context.getOrderable() and all_modules and buyURL"
+         tal:attributes="href buyLink"
+         href="collection_print_confirmation"
+         target="_blank">Order printed collection</a>
+
+      <h2 id="cnx_course_start">
+          <a tal:condition="all_modules"
+             tal:attributes="href python:all_modules[0].moduleLocation()+'?collection=%s' % collection"
+             i18n:translate="label_start_collection">Start 
+             <span i18n:name="reading_collection">
+                <span class="hiddenStructure" i18n:translate="label_reading_collection">reading the collection</span>
+             </span>
+             &#187;</a>
+      </h2>
+
+      <h3 id="cnx_course_start_2" style="margin-bottom: 1em; font-size: 1.25em; font-weight: bold;"
+          tal:define="moduleId context/favorites_last_read | nothing"
+          tal:condition="moduleId">
+          <img src="/star.png" tal:attributes="src string:$portal_url/star.png" />
+          <a href="#" tal:attributes="href string:$portal_url/content/$moduleId?collection=$objectId/$pathVersion">
+            Start from where I last left off &#187;
+          </a>
+      </h3>
+
+      <h2 i18n:translate="heading_collection_properties" class="hiddenStructure">Collection Properties</h2>
+
+      <p tal:condition="context/abstract" id="cnx_course_description">
+	<span class="cnx_before" i18n:translate="text_course_description">Summary: </span>
+              <span tal:replace="structure context/abstract_render">[description]</span></p>
+	
+      <p tal:condition="here/instructor" id="cnx_instructor"><span class="cnx_before" i18n:translate="text_course_instructor">Instructor: </span><span tal:replace="here/instructor">[instructor]</span></p>
+      <div tal:repeat="role python:here.roles.items()"
+        tal:define="opt_roles_dict here/portal_collaboration/optional_role_info">
+        <span class="cnx_before" i18n:translate="text_course_author">
+          <span i18n:name="collection_type">
+            <span tal:replace="shorttype">Course</span>
+          </span> 
+          <span tal:content="python:opt_roles_dict[role[0]][0]">[Role Name]</span><span i18n:name="plural"><span tal:condition="python:len(role[1]) > 1" i18n:translate="text_authors_plural">s</span></span>: </span>
+          <span class="cnx_person" tal:repeat="p python:role[1]" >
+          <tal:badauthor tal:on-error="string:(${p})">
+            <a tal:define="m python:here.desecured.getMemberById(p)" 
+              tal:content="m/fullname"
+              tal:attributes="href string:/member_profile/${p}">[fullname]</a></tal:badauthor><tal:comma tal:condition="not:repeat/p/end">, </tal:comma>
+        </span>
+      </div>
+      <p tal:condition="here/institution" id="cnx_institution">
+	<span class="cnx_before"
+	  i18n:translate="text_course_institution">Institution:
+	</span>
+	<span tal:replace="here/institution">[institution]</span></p>
+      <p tal:condition="here/code" id="cnx_course_code">
+       <span class="cnx_before" i18n:translate="label_course_code">
+         <span i18n:name="collection_type">
+            <span tal:replace="python:shorttype">Course</span>
+          </span> Number:
+        </span>
+        <span tal:replace="here/code">[code]</span></p>
+
+      <p id="cnx_course_website" tal:condition="here/homepage">
+	<a tal:attributes="href here/homepage"
+	  i18n:translate="label_course_website">
+	  <span i18n:name="collection_type">
+	    <span tal:replace="python:shorttype in ['Course'] and shorttype or 'External'">Course</span>
+	  </span> Web page</a>
+      </p>
+
+      <p id="cnx_course_contributors"
+         tal:define="contributors context/colContributors">
+
+        <span class="cnx_before" id="cnx_course_contributors_contains" i18n:translate="text_this_collection_contains">
+          This collection contains:
+        </span>
+
+        <tal:block tal:define="roles python:sequence.sort(contributors.keys());"
+          tal:repeat="role roles">
+          <tal:block tal:define="role_list python:map(here.desecured.getMemberById, contributors[role]);
+            sorted python:sequence.sort(role_list, (('fullname','cmp','asc'),));">
+            <span class="cnx_before" i18n:translate="text_course_contributing_authors">Modules 
+              <span i18n:name="role_name">
+                <span i18n:translate="" 
+                        tal:define="opt_roles_dict here/portal_collaboration/optional_role_info"
+                        tal:content="python:role!= 'authors' and opt_roles_dict[role][2].lower()+':' or 'by:'">[Optional Role Name]</span>
+                    </span></span>
+            <span class="cnx_person" tal:repeat="p sorted" >
+              <tal:badauthor tal:on-error="string:(${p})">
+                <a tal:content="p/fullname"
+                  tal:attributes="href string:/member_profile/${p/id}">[fullname]</a></tal:badauthor><tal:comma tal:condition="not:repeat/p/end">, </tal:comma><tal:period tal:condition="repeat/p/end">.</tal:period>
+            </span>
+          </tal:block>
+        </tal:block>
+      </p>
+
+    </div>
+
+    <div id="cnx_actions_bottom">
+      <div
+         tal:condition="public"
+         tal:replace="structure python:context.bottom_content_actions(view=actionsview,
+                                                                      module=None, collection=context)">
+        Content actions
+            Share collection
+            Give feedback
+            Download collection as 
+            Add collection to
+            Reuse / Edit
+      </div>
+    </div>
+
+    <div metal:use-macro="context/content_template/macros/footer" />
+
+    </div>
+
+    </div>
+
+    <div id="cnx_lens_popup" class="cnx_popup" style="display:none">
+      <div class="x-dlg-hd" i18n:translate="header_add_lens">Add to a lens</div>
+      <div class="x-dlg-bd" id="cnx_lens_inner" i18n:translate="text_content_add_lens">
+        Add this content to my lens:
+      </div>
+    </div>
+
+    <div id="cnx_reuse_edit_popup" class="cnx_popup" style="display:none">
+      <div class="x-dlg-hd" i18n:translate="header_reuse_edit">Reuse / Edit</div>
+      <div class="x-dlg-bd" id="cnx_reuse_edit_inner" i18n:translate="text_content_reuse_edit">
+        Reuse / edit:
+      </div>
+    </div>
+    <tal:google-analytics tal:define="isCNX context/isCNX|nothing;">
+      <script src="http://www.google-analytics.com/ga.js" type="text/javascript"> </script>
+
+      <script type="text/javascript">
+      	var _gaq = _gaq || [];
+        function trackthisGoogleAnalytics(strCode) {
+          try {
+            _gaq.push(['user._setAccount', strCode]);
+            _gaq.push(['user._trackPageview']);
+          }
+          catch(err) {}
+        }
+      </script>
+
+      <tal:script tal:condition="python:objectId == 'col10522' and isCNX">
+        <!-- CNX Google Analytics tracking for Collaborative Statistics course. -->
+        <script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['collabstats._setAccount', 'UA-5153795-1']);
+			_gaq.push(['collabstats._initData']);
+			_gaq.push(['collabstats._setCookiePath', '/content/']);
+			_gaq.push(['collabstats._trackPageview']);
+        </script>
+      </tal:script>
+
+      <tal:script tal:condition="isCNX">
+        <!-- CNX Google Analytics tracking for the William and Flora Hewlett Foundation. -->
+        <script type="text/javascript" tal:condition="isCNX">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-7903479-1']);
+			_gaq.push(['_setDomainName', '.cnx.org']);
+			_gaq.push(['_trackPageview']);
+			_gaq.push(['hewlett._setAccount', 'UA-5033010-1']);
+			_gaq.push(['hewlett._setDomainName', '.cnx.org']);
+			_gaq.push(['hewlett._trackPageview']);
+        </script>
+      </tal:script>
+
+      <tal:user-google-analytics
+          tal:define="versionFolder       python:context.aq_parent.portal_type == 'Folder' and context.aq_parent or None;
+                      codeGoogleAnalytics python:versionFolder and versionFolder.getGoogleAnalyticsTrackingCode() or None;"
+          tal:condition="python:codeGoogleAnalytics is not None">
+        <tal:comment replace="nothing">tal can not parameterize the interior of a script node,
+                                       but can parameterize the script node itself; thus, the trickiness.</tal:comment>
+        <!-- User supplied Google Analytics tracking. -->
+        <script type="text/javascript" id="user-google-analytics" user=""
+                tal:attributes="user codeGoogleAnalytics">
+          var thisElement;
+          var codeGoogleAnalytics;
+          thisElement = document.getElementById("user-google-analytics");
+          if ( thisElement ) {
+            strGoogleAnalyticsTrackingCode = thisElement.getAttribute('user');
+            if ( strGoogleAnalyticsTrackingCode ) {
+              trackthisGoogleAnalytics(strGoogleAnalyticsTrackingCode);
+            }
+          }
+        </script>
+      </tal:user-google-analytics>
+    </tal:google-analytics>
+
+  </body>
+</html>
+

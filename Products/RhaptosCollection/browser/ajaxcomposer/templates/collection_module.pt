@@ -1,0 +1,238 @@
+<tal:comment condition="nothing">
+Style to avoid jitter when button is made invisible
+</tal:comment>
+
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+
+    $('#kss-spinner').ajaxStart(function(){
+        $(this).show();
+    });
+    $('#kss-spinner').ajaxStop(function(){
+        $(this).hide();
+    });
+
+    var popup = $('div#collection-composer-popup');
+
+    var collection_module_change_handler = function(event){
+        $('div#collection-composer-popup').addClass('modified');
+    };
+    $('input:checkbox', popup).bind('change', collection_module_change_handler);
+
+    var collection_module_cancel_handler = function(event){
+        event.preventDefault();
+        popup.removeClass('modified');
+        composer_window.close();
+    };
+    $('input#collection-composer-cancel').bind('click', collection_module_cancel_handler);
+
+    // Search term
+    var collection_module_search_handler = function(event){
+        event.preventDefault();
+
+        var url = $(this).attr('action');
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: $('input', this).serialize(),
+            success: function(data){                               
+                $('div#<span tal:replace="view/__name__" />-body').html(data);
+            },
+            complete: function(){
+                // Remove inline onchange handlers in search_macros
+                $('#workspace_form_sorton').attr('onchange', 'return');
+                $('#workspace_form_b_size').attr('onchange', 'return');
+
+                // Rebind
+                $('form#<span tal:replace="view/__name__" />-form-search').bind('submit', collection_module_search_handler);
+                $('#workspace_form_sorton, #workspace_form_b_size').bind('change', collection_module_display_handler);    
+                $('div.listingBarSearch a').bind('click', collection_module_display_handler);    
+                $('form#collection_composer').bind('submit', collection_module_submit_handler);
+                $('input#collection-composer-cancel').bind('click', collection_module_cancel_handler);
+                $('input:checkbox', popup).bind('change', collection_module_change_handler);
+            }
+        }); 
+    }
+    $('form#<span tal:replace="view/__name__" />-form-search').bind('submit', collection_module_search_handler);    
+
+
+    // Results display, ie. sorting, batch size and visible batch
+    var collection_module_display_handler = function(event){
+        event.preventDefault();
+
+        var url = '<span tal:replace="context/absolute_url" />/@@<span tal:replace="view/__name__" />';
+        var serialized = '';
+
+        // If this is an anchor then append the querystring contains 
+        // everything we need thanks to ZTUtils.        
+        var href = $(this).attr('href');
+        if (href)
+            serialized = serialized + '&amp;' + href.split('?')[1];
+        else
+        {
+            // Skip variables must be sent to server. It lives in another form.
+            var serialized = $('form#collection-composer-collection-module-form-search input.skiplist').serialize();
+            if(serialized) { serialized = serialized + "&"; }
+            var form = $(this).parents('form:last');
+            serialized = serialized + $('input,select', form).serialize();
+        }
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: serialized,
+            success: function(data){                               
+                $('div#<span tal:replace="view/__name__" />-body').html(data);
+            }  ,
+            complete: function(){
+                // Remove inline onchange handlers in search_macros
+                $('#workspace_form_sorton').attr('onchange', 'return');
+                $('#workspace_form_b_size').attr('onchange', 'return');
+
+                // Rebind
+                $('form#<span tal:replace="view/__name__" />-form-search').bind('submit', collection_module_search_handler);
+                $('#workspace_form_sorton, #workspace_form_b_size').bind('change', collection_module_display_handler);    
+                $('div.listingBarSearch a').bind('click', collection_module_display_handler);    
+                $('form#collection_composer').bind('submit', collection_module_submit_handler);    
+                $('input#collection-composer-cancel').bind('click', collection_module_cancel_handler);
+                $('input:checkbox', popup).bind('change', collection_module_change_handler);
+            }
+        }); 
+    }
+
+    // The final submit handler
+    var collection_module_submit_handler = function(event){
+        event.preventDefault();
+
+        var serialized = $('input:checkbox:checked', this).serialize();
+        serialized = serialized + '&amp;form.submitted=1&amp;form.action=submit';
+
+        var url = $(this).attr('action');
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: serialized,
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {  
+                    // Create child nodes
+                    var node = find_treenode(collection_composer_tree.getRootNode(), '<span tal:replace="context/getId" />');
+
+                    var arr = eval(data.substring(6));
+                    for (var i=0;i<span tal:replace="structure string:&lt;" />arr.length;i++)                    
+                    {
+                        var newnode = new Module(arr[i]);
+                        node.appendChild(newnode);
+                    }
+                    node.expand();
+                    $('div#collection-composer-popup').removeClass('modified');
+                    composer_window.close();
+                    return;
+                }
+                else
+                    $('div#<span tal:replace="view/__name__" />-body').html(data);
+            },
+            complete: function(){
+                // Rebind
+                $('form#collection_composer').bind('submit', collection_module_submit_handler);
+            }
+        }); 
+    }
+    $('form#collection_composer').bind('submit', collection_module_submit_handler);    
+
+});
+<span tal:replace="structure string:</script>" />
+
+<tal:comment condition="nothing">
+search_macros has javascript race conditions which never surface during non 
+ajax operation. Declare required functions here to avoid that.
+</tal:comment>
+<script type="text/javascript">
+function hideId(id)
+{
+    $('#'+id).hide();
+}
+
+function show(clName)
+{
+    $('.'+clName).show();
+}
+</script>
+
+<div class="cnx_popup" id="collection-composer-popup">
+    <div class="x-dlg-bd" id="collection-composer-collection-module-body">
+    <metal:macro define-macro="body">
+        <div class="popup_scale_fixer">
+
+            <div class="popup-header-prefix">
+                <strong i18n:translate="add_modules_to">Add modules to</strong>
+            </div>
+            <h1 class="popup-header" 
+                tal:define="isCollection python:context.portal_type == 'Collection'">
+                <img tal:condition="isCollection"
+                     tal:attributes="src string:${context/portal_url}/collection-level.gif" alt="" title="">
+                <img tal:condition="not:isCollection"
+                     tal:attributes="src string:${context/portal_url}/folder_icon.gif" alt="" title="">
+                <span tal:replace="context/Title" />
+            </h1>
+            <div i18n:translate=""
+                 class="formHelp">
+                These will follow any existing subcollections and modules at this level.  To move them higher, or otherwise rearrange them, use the drag and drop feature in the 
+                collection editor main window.
+            </div>
+
+            <div>
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                 id string:${view/__name__}-form-search">
+                <small>
+                    <strong i18n:translate="">
+                        Search the Content Commons for modules to add:
+                    </strong>
+                </small>
+                <br/>
+
+                <input name="form.submitted" value="1" type="hidden" />
+                <tal:loop repeat="token request/skip|nothing">
+                    <input tal:attributes="value token"                           
+                           name="skip:list" class="skiplist" type="hidden" />
+                </tal:loop>
+                <!--<input name="form.action" value="search" type="hidden" />-->
+                <input name="location" value="repository" type="hidden" />
+                <input name="portal_types:list" value="Module" type="hidden" />
+                <input tal:attributes="value request/words|nothing"
+                       name="words" size="50" style="margin-top: 0.5em;" type="text" />
+                <input class="context searchButton" value="Search for modules" style="margin-top: 0.5em;" type="submit"
+                       id="collection-composer-collection-module-search"
+                       i18n:attributes="value search_for_modules" />
+                <input class="context" value="Cancel" style="margin-top: 0.5em;" type="submit"
+                       id="collection-composer-cancel"
+                       i18n:attributes="value cancel" />
+                <input name="inContext" value="True" type="hidden" />
+            </form>
+
+            <tal:def define="Iterator python:modules['Products.CMFPlone'].IndexIterator;
+                             tabindex python:Iterator(mainSlot=False);
+                             template nocall:context/search_macros;
+                             default_view string:compact;
+                             inContext python:True;
+                             inCourse python:True;
+                             portal python:context.portal_url.getPortalObject();
+                             results python:context.search_form_handler();
+                             empty python:[];
+                             skip request/skip|empty;
+                             results python:[r for r in results if r.objectId not in skip];
+                             length python:len(results)">
+                 <tal:if condition="results">
+                    <tal:block metal:use-macro="context/search_macros/macros/search_results" />
+                 </tal:if>
+                 <tal:if condition="python:not results and request.get('words')">
+                    <br />
+                    <span i18n:translate="">No results matched your query</span>
+                 </tal:if>
+            </tal:def>
+        </div>
+    </metal:macro>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

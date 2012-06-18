@@ -1,0 +1,19 @@
+        <table  xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal" border="0" class="tight">
+         <tr>
+          <td><div metal:use-macro="python: here.widget('institution', mode='view', use_label=1)"/></td>
+          <td><div metal:use-macro="python: here.widget('homepage', mode='view', use_label=1)"/></td>
+         </tr>
+         <tr>
+          <td><div metal:use-macro="python: here.widget('license', mode='view', use_label=1)"/></td>
+          <td><div metal:use-macro="python: here.widget('revised', mode='view', use_label=1)"/></td>
+         </tr>
+         <tr>
+          <td><div metal:use-macro="python: here.widget('code', mode='view', use_label=1)"/></td>
+          <td><div metal:use-macro="python: here.widget('version', mode='view', use_label=1)"/></td>
+         </tr>
+         <tr>
+          <td><div metal:use-macro="python: here.widget('instructor', mode='view', use_label=1)"/></td>
+          <td><div metal:use-macro="python: here.widget('created', mode='view', use_label=1)"/></td>
+         </tr>
+        </table>

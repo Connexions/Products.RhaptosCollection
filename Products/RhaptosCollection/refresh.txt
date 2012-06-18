@@ -1,0 +1,2 @@
+This works sporadically. If you get strange errors (like tpc_begin) or behaviour,
+try a few more times and then restart.

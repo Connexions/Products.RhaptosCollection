@@ -1,0 +1,384 @@
+/* <dtml-with base_properties> (do not remove this :) */
+/* <dtml-call "REQUEST.set('portal_url', portal_url())"> (not this either :) */
+
+/* Top matter */
+
+#cc-instructions{
+  font-size: .9em;
+  border-bottom: 2px solid #666;
+  padding-bottom: .5em;
+}
+
+#cc-instructions li{
+  margin-bottom: .25em;
+}
+
+#cc-instructions h4{
+  font-size: 1em;
+}
+
+/* Main tree */
+#coursetree {
+  padding: 0;
+  margin: 0;
+}
+
+#coursetree-loading{
+  text-align: center;
+  padding: 1em 0;
+}
+
+#coursetree img {
+    border: 0;
+}
+
+/* Node marked for deletion */
+li.delete_me {
+  background: #ffcccc !important;
+  text-decoration: line-through;
+}
+
+li.delete_me div {
+    background: #ffcccc !important;
+}
+
+/* Wrapper around ul.actions */
+div.actions-wrapper { 
+    float: right;
+    visibility: hidden;
+    z-index: 3;
+    position: relative;
+    padding: 0;
+    border: 0;
+    margin-left: 1em;
+    margin-top: -.1em;
+}
+
+/* Node actions */       
+ul.actions {
+  list-style: none none;
+  margin: 0;
+}
+
+ul.actions li {
+  display: inline;
+  list-style: none none;
+  padding: 0.5em;
+  margin-bottom: .25em;
+  font-size: 90%;
+  min-height: 16px;
+  background-repeat: no-repeat;
+  white-space: nowrap;
+}
+
+ul.actions li a {
+    color: &dtml-linkColor;;
+    text-decoration: underline;
+}
+
+ul.actions li a:hover {
+    text-decoration: underline;
+}
+
+/* Show actions */
+div.x-tree-node-over div.actions-wrapper {
+    visibility: visible;
+}
+
+/* Tree twisties */
+li.x-tree-node {
+    list-style-type: none;
+    list-style-image: none;
+    margin-bottom: 0;
+    white-space: normal;
+    clear: both;
+}
+
+img.x-tree-elbow-plus, img.x-tree-elbow-end-plus {
+    background: url('transmenus/rightArrow.gif') !important;
+    background-image: url('transmenus/rightArrow.gif') !important;
+    background-repeat: no-repeat !important;
+    vertical-align: middle;
+    height: 9px;
+}
+
+img.x-tree-elbow-minus, img.x-tree-elbow-end-minus {
+    background: url('transmenus/downArrow.gif') !important;
+    background-image: url('transmenus/downArrow.gif') !important;
+    background-repeat: no-repeat !important;
+    vertical-align: middle;
+    height: 9px;
+}
+
+span.x-tree-node-indent {
+   display: none;
+}    
+
+/* General tree settings */
+ul.x-tree-root-ct, ul.x-tree-node-ct {
+    margin: 0;
+}
+
+li.x-tree-node {
+    font-family: tahoma,verdana,arial,helvetica,sans-serif !important;
+}
+
+li.x-tree-node li.x-tree-node {
+    margin-left: 11px !important;
+}
+
+li.x-tree-node li.x-tree-node li.x-tree-node {
+    margin-left: 21px !important;
+}
+
+li.x-tree-node span {
+    white-space: normal;
+}
+
+li.x-tree-node div.x-tree-selected {
+    background-color: white;
+}
+
+li.x-tree-node a span{
+    color: &dtml-linkColor;;
+}
+
+.documentContent li a {
+    border-bottom-width: 0;
+}
+#coursetree .x-tree-node-anchor{
+    text-decoration: none;
+}
+
+li.x-tree-node div.x-tree-node-over {
+    background-color: #DDE6EE;
+}
+
+/* Cursor */
+div.x-tree-node-el { 
+    cursor: move;
+}    
+
+div.x-tree-node-over, a.x-tree-node-anchor { 
+    cursor: move;
+}    
+
+div.actions-wrapper { 
+    cursor: pointer;
+}    
+
+/* Hide actions when dragging */
+.x-dd-drag-ghost div.actions-wrapper {
+    display: none;
+}    
+
+/* Custom tree nodes */
+.node-collection, .node-subcollection, .node-module { 
+    border-bottom: 1px dashed silver;
+    padding: 0.5em;
+    font-size: 110% !important;
+}
+
+div.node-collection, div.node-collection span {
+    cursor: default;
+}
+
+div.node-collection span { 
+    font-size: 130%;
+    font-weight: bold;
+    color: black !important;
+}    
+
+.node-collection span, .node-subcollection span { 
+    font-weight: bold;
+}
+
+/* Custom tree node icons */
+.x-tree-ec-icon {
+    margin-left: -20px;
+}
+
+.x-tree-node-icon {
+    margin: 0 4px 0 0 !important;
+}
+
+.node-collection-icon { 
+    background-image: url('collection-level.gif') !important;
+    width: 22px !important;
+}    
+
+.node-subcollection-icon { 
+    background-image: url('folder_icon.gif') !important;
+}    
+
+.node-module-icon { 
+    background-image: url('module_icon.gif') !important;
+}
+
+div.node-collection img.x-tree-ec-icon { 
+    background-image: none;
+}    
+
+div.node-collection img.x-tree-elbow-end-minus { 
+    display: none;
+}    
+
+/* Popup aka dialog styling */
+
+.ui-dialog-content {
+    background: none;
+}
+
+.ui-widget-content {
+    background: #ffffff;
+}
+
+.x-dlg-bd,
+.cnx_popup_inner {
+    background: white;
+    padding: 1em;
+}
+
+div.popup_scale_fixer {
+    font-size: 111.5%;
+    line-height: 122%;
+}
+
+.down_arrow {
+  height: 9px;
+  width: 9px;
+  padding-right: 0px;
+  margin-left: -20px;
+}
+
+.no_contents{
+  margin: .5em 0 1em;
+}
+
+.existing_contents{
+  margin: .5em 0 1em;
+  padding: 0;
+  list-style: none none;
+  max-height: 5.5em;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #eef3f7;
+  background-color: #F7F9FB;
+}
+
+.existing_contents li{
+  margin: .25em 0;
+  padding: 0 0 0 21px;
+  background: no-repeat 2px 0;
+  list-style: none none;
+}
+
+.subcollection{
+  background-image: url(folder_icon.gif) !important;
+}
+.module{
+  background-image: url(module_icon.gif) !important;
+}
+
+input.subcollection, input.module{
+  background-repeat: no-repeat;
+  background-position: 3px 1px;
+  padding-left: 20px;
+}
+
+.popup-header-prefix{
+  margin-bottom: .35em;
+}
+
+.popup-header{
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 140%;
+  line-height: normal;
+}
+
+.popup-header .normal-text-in-header{
+  font-size: .7em;
+}
+
+div.popup_scale_fixer small{
+  font-size: .9em;
+}
+
+/* Pop-up for editing featured links.  These weren't working for IE from inside the template, and some of their values should be from dtml, so relocate them here. */
+
+#collection-composer-featured-links-body table.listing td{
+  padding: .25em 1em;
+  border-bottom: &dtml-borderWidth; &dtml-borderStyle; &dtml-globalBorderColor;;
+  background: &dtml-evenRowBackgroundColor;;
+}
+
+#collection-composer-featured-links-body .link-controls td {
+  padding: .2em .5em !important; 
+}
+#collection-composer-featured-links-body .link-controls {
+  border: 1px dashed #ddd;
+  padding: .5em 1em 1em;
+  margin-bottom: .75em;
+}
+
+#collection-composer-featured-links-body table.listing {
+  width: 100%;
+}
+#collection-composer-featured-links-body table.listing .link-controls{
+  border: none; padding: 0; margin: 0 0 .5em;
+}
+#collection-composer-featured-links-body table.listing .link-controls th{
+  border: none;
+  background-color: transparent;
+  padding: .2em .5em;
+  font-weight: bold;
+}
+#collection-composer-featured-links-body table.listing .link-controls td{
+  border: none;
+}
+
+#collection-composer-featured-links-body .control-disabled, #collection-composer-featured-links-body .control-disabled a {
+  color: #aaa !important;
+  color: &dtml-discreetColor; !important;
+  cursor: default !important;
+  text-decoration: none !important;
+}
+#collection-composer-featured-links-body input.control-disabled {
+  background: #fff !important;
+}
+
+#collection-composer-featured-links-body .link-edit-link{
+  text-decoration: underline;
+  vertical-align: top;
+  color: &dtml-linkColor;;
+}          
+
+/* Spinner indicating ajax activity */
+#kss-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    background-position: center center;
+    top: 50%;
+    left: 50%;
+    margin-top: -10px;
+    margin-left: -10px;
+    z-index: 15000;
+}
+
+#kss-spinner-base {
+    display:none;
+    width: 80px;
+    height: 20px;
+    position: fixed;
+    background-position: center center;
+    top: 50%;
+    left: 50%;
+    margin-top: -10px;
+    margin-left: -10px;
+    z-index: 15000;
+}
+
+/* </dtml-with> */

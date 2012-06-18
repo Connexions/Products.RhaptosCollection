@@ -1,0 +1,637 @@
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+    // In case of a "Cancel" being pressed, store the original form fields
+    var orig_form_data = {};
+
+    var popup = $('div#collection-composer-popup');
+    $('input, select, textarea', popup).bind('change', function(){
+        $('div#collection-composer-popup').addClass('modified');
+    });
+
+    // Store the original values so they can be reset later
+    var newlink = $('#new-link-controls');                
+    $('input:text, select', newlink).each(function(){     
+        orig_form_data[this.name] = $(this).val();           
+    });                                                   
+
+    // Change the radio button when text is entered into a url or module id input box
+    function newlink_radio_contentid() {
+        $('form#<span tal:replace="view/__name__" />-form-newlink input[name="connexions_id"]').focus(function(){
+            $('form#<span tal:replace="view/__name__" />-form-newlink input#radioid').attr("checked", "checked");
+        });
+    };
+    newlink_radio_contentid();
+    function newlink_radio_url() {
+        $('form#<span tal:replace="view/__name__" />-form-newlink input[name="url"]').focus(function(){
+            $('form#<span tal:replace="view/__name__" />-form-newlink input#radiourl').attr("checked", "checked");
+        });
+    };
+    newlink_radio_url();
+
+    $('input#collection-composer-cancel').bind('click', function(event){
+        event.preventDefault();
+        popup.removeClass('modified');
+        composer_window.close();
+    });
+
+    // For all cancel events, scrub the HTML of validation gunk
+    var validation_scrub = function(context) {
+        // Always remove the 1st child of an error div (It contains a message)
+        $('div.error > *:not(:first-child)').each(function(i, el) {
+            var child = $(el);
+            child.insertAfter(child.parent());
+        });
+        $('div.error').remove();
+        popup.removeClass('modified');
+    };
+
+    // Edit link launcher
+    var featured_links_editlink = function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        var tr = $(this).parents('tr:last');
+        // Store the original values in case the cancel button is pressed
+        $('input:text, select', tr).each(function(){
+            orig_form_data[this.name] = $(this).val();
+        });
+        // Show uncle with class link-controls
+        $('div.link-controls', tr).show();
+
+        $('#new-link-activate').addClass("control-disabled") ;
+        $('#new-link-activate').attr("disabled","disabled") ;
+        $('#links-update').addClass("control-disabled") ;
+        $('#links-done').addClass("control-disabled") ;
+        $(this).parent().addClass("control-disabled") ;
+        $('td.link-edit-link').addClass("control-disabled") ;
+        $('a.edit-link').addClass("control-disabled") ;
+        $('a.remove-link').addClass("control-disabled") ;
+        $('#links-update').attr("disabled","disabled") ;
+        $('#links-done').attr("disabled","disabled") ;
+        $('div.edit-link-title', tr).hide();
+    };
+    $('a.edit-link').bind('click', featured_links_editlink);
+
+
+    // Remove link launcher
+    var featured_links_removelink = function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+        var answer = confirm("Are you sure you want to remove this link?");
+        if (answer)             
+        {
+            // Hide row
+            var tr = $(this).parents('tr:last');
+            tr.hide();
+            // Add marker class to form
+            var form = $('form', tr);
+            form.addClass('remove');
+
+            var url = form.attr("action");
+
+            // Flag modified
+            //$('div#collection-composer-popup').addClass('modified'); 
+
+            // Immediately delete
+            var serialized = $('select, input:text, input:hidden', form).serialize();
+            serialized = serialized +'&amp;form.action=remove';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                async: true,
+                data: serialized,
+                success: function(data){
+                    form.remove(); 
+                }
+            });
+        }        
+    };
+    $('a.remove-link').bind('click', featured_links_removelink);
+
+    // Cancel edit of link
+    var featured_links_editlink_cancel = function(event){
+        if (event)
+            event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        // Hide uncle with class link-controls
+        var tr = $(this).parents('tr:last');
+
+        // Scrub any validation errors
+        validation_scrub($('div.link-controls'));
+
+        $('div.link-controls', tr).hide();
+        // Restore the original values since the cancel button was pressed
+        $('input:text, select', tr).each(function(){
+            $(this).val(orig_form_data[this.name]);
+        });
+
+        $('#new-link-activate').removeClass("control-disabled") ;
+        $('#new-link-activate').removeAttr("disabled") ;
+        $('#links-update').removeClass("control-disabled") ;
+        $('#links-done').removeClass("control-disabled") ;
+        $(this).parent().removeClass("control-disabled") ;
+        $('td.link-edit-link').removeClass("control-disabled") ;
+        $('a.edit-link').removeClass("control-disabled") ;
+        $('a.remove-link').removeClass("control-disabled") ;
+        $('#links-update').removeAttr("disabled") ;
+        $('#links-done').removeAttr("disabled") ;
+        $('div.edit-link-title', tr).show();
+
+        // Can't reset the form because some fields may 
+        // not have passed validation and so they'd have the
+        // intermediate, invalid values.
+
+        // Reset edit form
+        //var id = $(this).parents('form:first').attr('id');
+        //document.getElementById(id).reset();
+    };
+    $('div.link-controls input.cancel').bind('click', featured_links_editlink_cancel);
+
+
+    // Show new link form
+    $('a#new-link-activate').bind('click', function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        // Store the original values in case the cancel button is pressed
+        var newlink = $('#new-link-controls');
+        $('input:text, select', newlink).each(function(){
+            orig_form_data[this.name] = $(this).val();
+        });
+
+        $('#new-link-controls').show() ;
+        $(this).addClass("control-disabled") ;
+        $(this).attr("disabled","disabled") ;
+        $('#links-update').addClass("control-disabled") ;
+        $('#links-done').addClass("control-disabled") ;
+        $('td.link-edit-link').addClass("control-disabled") ;
+        $('a.edit-link').addClass("control-disabled") ;
+        $('a.remove-link').addClass("control-disabled") ;
+        $('#links-update').attr("disabled","disabled") ;
+        $('#links-done').attr("disabled","disabled") ;
+    });
+
+
+    // Cancel new link form
+    var featured_links_newlink_cancel = function(event){
+        if (event)
+            event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        // Scrub any validation errors
+        validation_scrub($('#new-link-activate'));
+
+        $('#new-link-controls').hide() ;
+        $('#new-link-activate').removeClass("control-disabled") ;
+        $('#new-link-activate').removeAttr("disabled") ;
+        $('#links-update').removeClass("control-disabled") ;
+        $('#links-done').removeClass("control-disabled") ;
+        $('td.link-edit-link').removeClass("control-disabled") ;
+        $('a.edit-link').removeClass("control-disabled") ;
+        $('a.remove-link').removeClass("control-disabled") ;
+        $('#links-update').removeAttr("disabled") ;
+        $('#links-done').removeAttr("disabled") ;    
+        $('div#collection-composer-newlink div.error').removeClass('error');
+        //document.getElementById('<span tal:replace="view/__name__" />-form-newlink').reset();
+
+        // Restore the original values since the cancel button was pressed
+        var newlink = $('#new-link-controls');
+        $('input:text, select', newlink).each(function(){
+            $(this).val(orig_form_data[this.name]);
+        });
+
+
+        // Close popup if there were no links when the popup was first opened
+        var num = $('#new-link-num-links').val();
+        if (num == '0')
+            composer_window.close();  
+    };
+    $('#new-link-cancel').bind('click', featured_links_newlink_cancel);    
+
+
+    // New link submit
+    var featured_links_newlink_submit = function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        var serialized = $('input:text, select, input:radio:checked', this).serialize();
+        serialized = serialized +'&amp;form.submitted=1&amp;form.action=create';
+
+        var url = $(this).attr('action');
+        $('div#kss-spinner').show();
+        $.ajax({
+            type: 'POST',
+            url: url,
+            async: false,
+            data: serialized,
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {    
+                    // Add new link to table
+                    var html = data.substring(6);
+                    var table = $('table#collection-composer-featured-links-table');
+                    table.append(html);
+
+                    // Bind
+                    $('a.edit-link').bind('click', featured_links_editlink);
+                    $('a.remove-link').unbind('click', featured_links_removelink);
+                    $('a.remove-link').bind('click', featured_links_removelink);
+                    $('div.link-controls input.cancel').bind('click', featured_links_editlink_cancel);
+                    $('form.<span tal:replace="view/__name__" />-form-editlink').bind('submit', featured_links_editlink_submit);    
+
+                    // 'Cancel' new link area
+                    $('#new-link-num-links').val('1');
+                    featured_links_newlink_cancel();
+                    //document.getElementById('<span tal:replace="view/__name__" />-form-newlink').reset();
+
+                    // Reset modified flag
+                    popup.removeClass('modified');
+
+                    // Make sure new link link is visible
+                    $('#new-link-activate-wrapper').show();
+
+                    // Make sure done button is visible
+                    $('#links-done').parents('div:first').show() ;
+                }
+                else {
+                    $('div#collection-composer-newlink').html(data);
+                    // Make sure the radio buttons update when the user enteres text into either the url or content id
+                    newlink_radio_contentid();
+                    newlink_radio_url();
+                }
+            }  
+        }); 
+        $('div#kss-spinner').hide();
+    };
+    $('form#<span tal:replace="view/__name__" />-form-newlink').bind('submit', featured_links_newlink_submit);    
+
+
+    // Edit link submit
+    var featured_links_editlink_submit = function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+        var form = $(this);
+
+        var serialized = $('select, input:text, input:hidden, input:radio:checked', this).serialize();
+        serialized = serialized +'&amp;form.action=edit';
+
+        var url = $(this).attr('action');
+        $('div#kss-spinner').show();
+        $.ajax({
+            type: 'POST',
+            url: url,
+            async: false,
+            data: serialized,
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {         
+                    // Add marker class to form
+                    form.addClass('edit');
+
+                    // 'Cancel' edit link area
+                    // Hide uncle with class link-controls
+                    var tr = form.parents('tr:first');
+                    $('div.link-controls', tr).hide();
+                    $('#new-link-activate').removeClass("control-disabled") ;
+                    $('#new-link-activate').removeAttr("disabled") ;
+                    $('#links-update').removeClass("control-disabled") ;
+                    $('#links-done').removeClass("control-disabled") ;
+                    var el = $('input.cancel', this);
+                    el.parent().removeClass("control-disabled") ;
+                    $('td.link-edit-link').removeClass("control-disabled") ;
+                    $('a.edit-link').removeClass("control-disabled") ;
+                    $('a.remove-link').removeClass("control-disabled") ;
+                    $('#links-update').removeAttr("disabled") ;
+                    $('#links-done').removeAttr("disabled") ;
+                    $('div.edit-link-title', tr).show();
+
+                    // Update label
+                    var tr = form.parents('tr:last');
+                    //$('div.edit-link-title span:first', tr).html(data.substring(6));
+                    $('div.edit-link-title', tr).html(data.substring(6));
+
+                    // Reset modified flag
+                    $('div#collection-composer-popup').removeClass('modified');
+                }
+                else
+                    $('div.collection-composer-editlink', form).html(data);
+            }  
+        }); 
+        $('div#kss-spinner').hide();
+    };
+    $('form.<span tal:replace="view/__name__" />-form-editlink').bind('submit', featured_links_editlink_submit);    
+
+
+    // Done button clicked
+    var featured_links_done = function(event){
+        event.preventDefault();
+        if (hasClass(this, 'control-disabled'))
+            return;
+
+        $('div#collection-composer-popup').removeClass('modified');
+        composer_window.close();
+    };
+    $('#links-done').bind('click', featured_links_done);
+
+});
+<span tal:replace="structure string:</script>" />
+
+<div class="cnx_popup" id="collection-composer-popup">
+    <div class="x-dlg-bd" id="collection-composer-featured-links-body">
+    <metal:macro define-macro="body">
+        <div class="popup_scale_fixer">
+
+    <tal:def define="num_links python:len(context.getLinks(sequence=0))">
+
+    <div class="popup-header-prefix">
+        <strong i18n:translate="create_edit_links_for">
+            Create/edit links for
+        </strong>
+    </div>
+    <h1 class="popup-header">
+        <img tal:attributes="src string:${context/portal_url}/module_icon.gif" alt="" title="" height="16" width="16">
+        <span tal:replace="context/Title" />
+        <span class="normal-text-in-header">
+            (<span tal:replace="context/getId" />)
+        </span>
+    </h1>
+
+    <div style="margin-bottom: 1em;">
+        <span class="field" tal:define="modurl view/published_module_url">
+            <a tal:attributes="href modurl" 
+               target="_blank" title="Opens in a new window"
+               i18n:translate="visit_published_module"
+               i18n:attributes="title opens_in_a_new_window">
+                Visit published module</a>
+            <a tal:attributes="href modurl"
+               target="_blank">
+                <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/external-link.png" 
+                     i18n:attributes="title opens_in_a_new_window"
+                     title="Opens in new window" /></a>
+        </span>
+    </div>
+
+    <div> 
+        <p i18n:translate="">
+        You can add your own featured links to supplement or replace the original module links. <b>These links will appear only in 
+        the context of 
+        this collection.</b> <span>Make sure that all of your links are published and/or publicly available.</span>
+        </p>
+
+        <table id="collection-composer-featured-links-table" class="listing" style="border-top: 1px solid #8cacbb;">
+        <tbody>
+            <tal:links repeat="link python:context.getLinks(sequence=0)">
+            <metal:macro define-macro="editlink_row">
+            <tr>
+                <td style="width: 100%; font-size: 1.1em;">
+
+                    <div class="edit-link-title">
+                        <metal:macro define-macro="editlink_label">
+                        <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/strength${link/strength}.png"/>
+                        <span tal:content="link/title"></span>
+                        <a tal:attributes="href link/target"
+                           target="_blank" class="icon" 
+                           title="Visit link in new window"
+                           i18n:attributes="title visit_link_in_new_window"><img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/external-link.png" /></a>
+                        </metal:macro>
+                    </div>
+
+                    <div class="link-controls" style="display: none;">
+                        <form tal:define="marker_class marker_class|string:"
+                              tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                              class string:${view/__name__}-form-editlink ${marker_class};
+                                              id view/random_id">
+                            <div class="collection-composer-editlink">
+                            <metal:macro define-macro="editlink">
+                            <input tal:attributes="value request/id|link/getId" name="id" type="hidden" />
+                            <table>
+                            <tbody>
+                                <tr tal:define="error errors/title|nothing">
+                                    <th style="padding-right: 0.5em; text-align: left;">
+                                        <span i18n:translate="link_title">Link title</span>:
+                                    </th>
+                                    <td colspan="2">
+                                        <div tal:omit-tag="not:error"
+                                             class="error">
+                                            <div tal:content="error"></div>
+                                            <input tal:attributes="value request/title|link/title"
+                                                   name="title" size="30" type="text">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="padding-right: 0.5em; text-align: left;">
+                                        <span i18n:translate="type">Type</span>:
+                                    </th>
+                                    <td colspan="2">
+                                        <select name="category">
+                                            <option tal:repeat="linktype here/getLinkTypes"
+                                                    tal:content="linktype/capitalize"
+                                                    tal:attributes="value linktype;
+                                                                    selected python:(request.get('category') or link.category) == linktype">
+                                                Category
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="padding-right: 0.5em; text-align: left;">
+                                        <span i18n:translate="strength">Strength</span>:
+                                    </th>
+                                    <td colspan="2">
+                                        <select name="strength">
+                                            <option tal:attributes="selected python:(request.get('strength') or link.strength) in ('3',3)" value="3"> 3 : <span i18n:translate="strongly_related_link">Strongly related link</span> </option>
+                                            <option tal:attributes="selected python:(request.get('strength') or link.strength) in ('2',2)" value="2"> 2 : <span i18n:translate="related_link">Related link</span> </option>
+                                            <option tal:attributes="selected python:(request.get('strength') or link.strength) in ('1',1)" value="1"> 1 : <span i18n:translate="weakly_related_link">Weakly related link</span> </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr tal:define="error errors/url|nothing">
+                                    <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                                        URL:
+                                    </th>
+                                    <td colspan="2">
+                                        <div tal:omit-tag="not:error"
+                                             class="error">
+                                            <div tal:content="error"></div>
+                                            <input tal:attributes="value target|request/url|link/target"
+                                                   name="url" size="30" type="text" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            </metal:macro>
+                            </div>
+
+                            <input i18n:attributes="value update_link"
+                                   class="context" name="submit" value="Update Link" type="submit" /> 
+                            <input i18n:attributes="value cancel"
+                                   class="context cancel" value="Cancel" type="button" />
+                            <input name="form.submitted" value="1" type="hidden" />
+                        </form>
+                    </div>              
+                </td>
+
+                <td nowrap="nowrap" class="link-edit-link">
+                    <a href="#" class="edit-link" i18n:translate="edit_link">Edit link</a>
+                </td>
+
+                <td nowrap="nowrap" class="link-edit-link" id="lel-2">
+                    <a class="remove-link" href="#" i18n:translate="remove">Remove</a>
+                </td>
+            </tr>
+            </metal:macro>
+            </tal:links>
+
+        </tbody>
+        </table>
+
+        <div tal:define="display_style python:num_links and 'block' or 'none'"
+             tal:attributes="style string:margin: 0 0 1em;; display: ${display_style}"
+             id="new-link-activate-wrapper">
+            <a href="#" id="new-link-activate">
+                + <span i18n:translate="create_a_new_link" tal:omit-tag="">Create a new link</span>
+            </a>
+        </div>
+              
+        <div tal:define="display_style python:num_links and 'none' or 'block'"
+             tal:attributes="style string:display: ${display_style}"
+             id="new-link-controls" class="link-controls">
+
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                  id string:${view/__name__}-form-newlink">
+                <div id="collection-composer-newlink">                
+                <metal:macro define-macro="newlink">  
+                <table>
+                <tbody>
+                    <tr tal:define="error errors/title|nothing">
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span i18n:translate="link_title">Link title</span>:
+                        </th>
+                        <td colspan="2">
+                            <div tal:omit-tag="not:error"
+                                 class="error">
+                                <div tal:content="error"></div>
+                                <input tal:attributes="value request/title|nothing"
+                                       name="title" size="30" type="text" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                             <span i18n:translate="type">Type</span>:
+                         </th>
+                         <td colspan="2">
+                             <select name="category">
+                                 <option tal:repeat="linktype here/getLinkTypes"
+                                         tal:content="linktype/capitalize"
+                                         tal:attributes="value linktype;
+                                                         selected python:request.get('category', '') == linktype">
+                                     Category
+                                 </option>
+                             </select>
+                         </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span i18n:translate="strength">Strength</span>:
+                        </th>
+                        <td colspan="2">
+                            <select name="strength">
+                                <option tal:attributes="selected python:request.get('strength') == '3'" value="3"> 3 : <span i18n:translate="strongly_related_link">Strongly related link</span> </option>
+                                <option tal:attributes="selected python:request.get('strength') == '2'" value="2"> 2 : <span i18n:translate="related_link">Related link</span> </option>
+                                <option tal:attributes="selected python:request.get('strength') == '1'" value="1"> 1 : <span i18n:translate="weakly_related_link">Weakly related link</span> </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td style="">
+                            <input tal:attributes="checked python:request.get('urlorid', 'url') == 'url'"
+                                   name="urlorid" id="radiourl" type="radio" value="url" class="noborder">
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span i18n:translate="enter_either_a_url">Enter EITHER a URL</span>:
+                        </th>
+                        <td tal:define="error errors/url|nothing"
+                            colspan="2">
+                            <div tal:omit-tag="not:error"
+                                 class="error">
+                                <div tal:content="error"></div>
+                                <input tal:attributes="value request/url|nothing"
+                                       name="url" size="30" type="text" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="">
+                            <input tal:attributes="checked python:request.get('urlorid', '') == 'id'"
+                                   name="urlorid" id="radioid" type="radio" value="id" class="noborder" />
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span i18n:translate="or_a_connexions_id">OR a <span tal:replace="context/portal_properties/title" i18n:name="portal_title">[PORTAL_TITLE]</span> ID</span>:
+                        </th>
+                        <td tal:define="error errors/connexions_id|nothing"
+                            colspan="2" style="padding-bottom: 1em; padding-right: 0.5em;">
+                            <div tal:omit-tag="not:error"
+                                 class="error">
+                                <div tal:content="error"></div>
+                                <input tal:attributes="value request/connexions_id|nothing"
+                                       name="connexions_id" size="8" type="text" />
+
+                                <span style="padding: 0pt 0.25em; font-weight: bold;">
+                                    <span i18n:translate="version">Version</span> 
+                                    <span style="font-weight: normal;">(<span i18n:translate="optional">optional</span>)</span>
+                                </span>:
+                                <input tal:attributes="value request/version|nothing"
+                                       name="version" size="3" type="text" />
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                </metal:macro>
+                </div>
+
+                <input tal:attributes="value num_links"
+                       name="num_links" type="hidden"
+                       id="new-link-num-links"/>
+                <input class="context" value="Add New Link" type="submit"
+                       i18n:attributes="value add_new_link" /> 
+                <input class="context" value="Cancel" id="new-link-cancel" type="button"
+                       i18n:attributes="value cancel" />
+                <input name="form.submitted" value="1" type="hidden" />
+
+            </form>
+        </div>              
+              
+    </div>
+
+    <div tal:define="display_style python:num_links and 'block' or 'none'"
+         tal:attributes="style string:display:${display_style}"
+         style="text-align: center;">
+        <form>
+            <input class="standalone" type="submit" id="links-done" value="Done" 
+                   i18n:attributes="value done" />
+        </form>
+    </div>
+
+     </tal:def>
+    </metal:macro>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

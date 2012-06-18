@@ -1,0 +1,10 @@
+qi = app.plone.portal_quickinstaller
+name = 'RhaptosCollection'
+if not qi.isProductInstalled(name):
+    qi.installProduct(name)
+else:
+    qi.reinstallProducts([name])
+
+import transaction
+transaction.commit()
+print "transaction complete"

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<object name="portal_properties" meta_type="Plone Properties Tool">
+ <object name="rhaptos_collection_print_config"
+    meta_type="Plone Property Sheet">
+  <property
+     name="title">Rhaptos Collection Print System Configuration</property>
+  <property name="servicehost" type="string"></property>
+  <property name="servicepath" type="string"></property>
+  <property name="buyBookURLformat" type="string"></property>
+  <property name="buyBookSiteBlurb" type="text"></property>
+  <property name="buyBookCnxBlurb" type="text"></property>
+  <property name="lastPageBlurb" type="text"></property>
+ </object>
+ <object name="site_properties">
+  <property name="typesUseViewActionInListings" purge="False">
+   <element value="Collection" />
+   <element value="SubCollection" />
+   <element value="PublishedContentPointer" />
+  </property>
+ </object>
+</object>

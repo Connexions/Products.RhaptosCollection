@@ -1,0 +1,21 @@
+trunk (2010-02-26)
+==================
+
+  - xxx [Rhaptos developers]
+
+0.55 (2010-02-26)
+=================
+
+  - CONNEXIONSSRV-78: fix print preview scripts [jlaplace]
+
+
+trunk (2009-09-23)
+==================
+
+  - CONNEXIONSSRV-34: Refactor to use GenericSetup [jlaplace]
+
+
+trunk (2009-09-15)
+==================
+
+  - CONNEXIONSSRV-12: Create initial egg structure [jlaplace]

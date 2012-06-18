@@ -1,0 +1,140 @@
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+
+    var remove_handler = function(event){
+        event.preventDefault();
+
+        var url = $(this).attr('action');
+        $.ajax({
+            type: 'POST',
+            url: url,
+            async: false,
+            data: $('input', this).serialize(),
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {                   
+                    // Update tree node and close popup
+                    var node = find_treenode(collection_composer_tree.getRootNode(), '<span tal:replace="context/getId" />');
+                    node.parentNode.removeChild(node)
+
+                    window_remove_contained.close();
+                    return;
+                }
+                else
+                    $('div#<span tal:replace="view/__name__" />-body').html(data);
+            }  
+        }); 
+
+        // Rebind
+        $('form#<span tal:replace="view/__name__" />-form').bind('submit', remove_handler);
+    }
+
+    $('form#<span tal:replace="view/__name__" />-form').bind('submit', remove_handler);    
+
+});
+<span tal:replace="structure string:</script>" />
+
+<div id="collection-title-parameters" class="cnx_popup">
+    <div class="x-dlg-bd" id="cnx_collection_title_parameters_inner">
+        <div tal:define="isModule python:context.portal_type == 'PublishedContentPointer';
+                         isSubCollection not:isModule"
+             class="popup_scale_fixer">
+            <div class="popup-header-prefix">
+                <strong tal:condition="isModule"
+                        i18n:translate="remove_module">Remove module</strong>
+                <strong tal:condition="isSubCollection"
+                        i18n:translate="remove_subcollection">Remove subcollection</strong>
+            </div>
+            <h1 class="popup-header">
+                <img tal:condition="isModule"
+                     tal:attributes="src string:${context/portal_url}/module_icon.gif" alt="" title="">
+                <img tal:condition="isSubCollection"
+                     tal:attributes="src string:${context/portal_url}/folder_icon.gif" alt="" title="">
+                    <span tal:content="context/Title"></span>
+                <span tal:condition="isModule"
+                      class="normal-text-in-header">(<span tal:replace="context/getId" />)</span>
+            </h1>
+
+            <div tal:condition="isModule"
+                 style="margin-bottom: 1em;">
+                <span class="field" tal:define="modurl python:context.moduleLocation()">
+                    <a tal:attributes="href modurl" target="_blank" title="Opens in new window">Visit published module</a>
+                    <a tal:attributes="href modurl" target="_blank">
+                        <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/external-link.png" 
+                             title="Opens in new window"/></a>
+              </span>
+            </div>
+
+            <p tal:condition="isModule"
+               i18n:translate="remove_module_from_collection_prompt">
+            Are you sure you want to remove this module from the collection?  This will not remove 
+            the published module from the repository.
+            </p>
+
+            <p tal:condition="isSubCollection"
+               i18n:translate="remove_subcol_from_collection_prompt">
+            Are you sure you want to remove this subcollection (and all of its contents) from the collection?  This will not remove 
+            published modules from the repository.
+            </p>
+
+            <p tal:condition="isSubCollection">
+                <strong tal:define="number_sub view/number_of_subcollection_descendants;
+                                    number_mod view/number_of_module_descendants">
+                <tal:if tal:condition="python:number_sub or number_mod">
+                    Warning: this subcollection includes 
+                </tal:if>
+                <tal:if tal:condition="number_sub">
+                    <span tal:replace="number_sub" />
+                    <tal:pluralize tal:condition="python:number_sub == 1">
+                        subcollection                                 
+                    </tal:pluralize>                              
+                    <tal:pluralize tal:condition="python:number_sub > 1">
+                        subcollections
+                    </tal:pluralize>
+                </tal:if>
+
+                <tal:if tal:condition="python:number_sub > 0 and number_mod > 0">
+                    and
+                </tal:if>
+
+                <tal:if tal:condition="number_mod">
+                    <span tal:replace="number_mod" />             
+                    <tal:pluralize tal:condition="python:number_mod == 1">  
+                        module
+                    </tal:pluralize>                              
+                    <tal:pluralize tal:condition="python:number_mod > 1">  
+                        modules
+                    </tal:pluralize>                              
+
+                </tal:if>
+                </strong>
+            </p>
+
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                 id string:${view/__name__}-form"
+                  name="form"
+                  method="post">
+
+                <input name="form.submitted" 
+                       value="1" 
+                       type="hidden" />
+
+                <input tal:condition="isModule"
+                       i18n:attributes="value remove_module" 
+                       class="standalone destructive" 
+                       type="submit" 
+                       value="Remove module" />
+                <input tal:condition="isSubCollection"
+                       i18n:attributes="value remove_subcollection" 
+                       class="standalone destructive" 
+                       type="submit" 
+                       value="Remove subcollection" />
+                <input i18n:attributes="value cancel" class="standalone" type="submit" value="Cancel" onclick="window_remove_contained.close();return false"/>
+            </form>
+
+        </div>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+      
+	<tal:comment>
+	This should possibly be made more generic.  But, I'll leave it
+	specific to subjects for now.
+	</tal:comment>
+
+  <body>
+
+    <span class="field" metal:define-macro="view">
+    <metal:use use-macro="here/widgets/multiselection/macros/view">
+    </metal:use>
+    </span>
+
+    <metal:define define-macro="edit">
+    <metal:use use-macro="here/widgets/field/macros/edit">
+     <metal:fill metal:fill-slot="widget_body"
+                 tal:define="vocab python:field.Vocabulary(here);
+                             vlen python:len(vocab);">
+          
+            <div tal:define="DisplayList python:modules['Products.Archetypes.utils'].DisplayList;
+              subjs_one python:vocab[:3];
+              subjs_two python:DisplayList(vocab[3:])">
+              <input type="hidden"
+                value=""
+                tal:condition="not:field/required|nothing"
+                tal:attributes="name string:$fieldName:default:list;" />
+              <table>
+                <tr tal:define="indexes python:range(len(subjs_one))"
+                  tal:repeat="i indexes">
+                  <td tal:define="item python:subjs_one[i]">
+                  <tal:block tal:define="tabindex tabindex/next" tal:on-error="item">
+                      <input class="noborder"
+                        tal:attributes="type string:checkbox;
+                        name string:$fieldName:list;
+                        id string:${fieldName}_${tabindex};
+                        tabindex tabindex;
+                        checked python:test(here.unicodeTestIn(item, value), 'checked', None);
+                        value nocall:item;"
+                        />
+                      <label tal:content="python:here.translate(vocab.getMsgId(item), default=vocab.getValue(item))"
+                        i18n:translate=""
+                        tal:attributes="for string:${fieldName}_${tabindex}" />
+                    </tal:block>
+                  </td>
+                  <td tal:define="item python:subjs_two[i]">
+                    <tal:block tal:define="tabindex tabindex/next">
+                      <input class="noborder"
+                        tal:attributes="type string:checkbox;
+                        name string:$fieldName:list;
+                        id string:${fieldName}_${tabindex};
+                        tabindex tabindex;
+                        checked python:test(here.unicodeTestIn(item, value), 'checked', None);
+                        value nocall:item;"
+                        />
+                      <label tal:content="python:here.translate(vocab.getMsgId(item), default=vocab.getValue(item))"
+                        i18n:translate=""
+                        tal:attributes="for string:${fieldName}_${tabindex}" />
+                    </tal:block>
+                  </td>
+                </tr>
+              </table>
+            </div>
+        </metal:fill>
+      </metal:use>
+    </metal:define>
+
+    <div metal:define-macro="search">
+      <div metal:use-macro="here/widgets/multiselection/macros/search">
+      </div>
+    </div>
+
+  </body>
+
+</html>

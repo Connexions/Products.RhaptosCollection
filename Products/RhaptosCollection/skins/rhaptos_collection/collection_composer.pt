@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<div  tal:omit-tag=""
+      tal:define="course context/nearestCourse | context"
+      xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+<html lang="en-US"
+      metal:use-macro="here/module_template/macros/master">
+  <head>
+
+    <script type="text/javascript" src="/transmenus/transMenus0_9_2.js"
+            tal:attributes="href string:$portal_url/transmenus/transMenus0_9_2.js"
+            metal:fill-slot="javascript_head_slot"></script>
+
+    <metal:css metal:fill-slot="css_slot">
+     <link rel="stylesheet" href="/content_browse.css" type="text/css" title="Search" media="screen"
+           tal:attributes="href string:$portal_url/content_browse.css" />
+     <link rel="stylesheet" href="/transmenus/basic.css" type="text/css" title="Default" media="screen"
+           tal:attributes="href string:$portal_url/transmenus/basic.css" />
+     <!--<link rel="alternate stylesheet" href="transmenus/extended.css" title="Extended" media="screen"/>-->
+     <style type="text/css">@import url(collection_composer.css);</style>
+     <!--[if IE]>
+       <style type="text/css">@import url(collection_composer_ie.css);</style>
+     <![endif]-->
+     <link rel="stylesheet" type="text/css" tal:attributes="href string:$portal_url/extjs/resources/css/ext-all.css"/>
+     <link rel="annotations" tal:attributes="href string:${course/absolute_url}/annotations" />
+    </metal:css>
+
+  </head>
+
+  <body>
+
+    <metal:block metal:fill-slot="super" tal:condition="show_border"
+                 tal:define="actions python:here.portal_actions.listFilteredActionsFor(course);">
+      <div metal:use-macro="here/global_contentviews/macros/content_views">The content views</div>
+      <div metal:use-macro="here/global_contentviews/macros/content_actions">The content bar</div>
+    </metal:block>
+
+    <div metal:fill-slot="main" tal:define="typename here/archetype_name;
+                                            panel options/panel | request/panel | here/panel | default">
+
+    <script type="text/javascript" src="/extjs/ext.js"
+                tal:attributes="src string:$portal_url/extjs/ext.js"></script>
+<!--<script type="text/javascript" src="/extjs/ext.js"
+                tal:attributes="src string:$portal_url/extjs/ext-core-debug.js"></script>
+-->                
+    <script type="text/javascript"
+                tal:attributes="src string:$portal_url/extjs/adapter/jquery/jquery.js"></script> 
+    <script tal:attributes="src string:${context/absolute_url}/composer_classes.js"
+            type="text/javascript"></script>
+    <script tal:attributes="src string:${context/absolute_url}/composer.js"
+            type="text/javascript"></script>
+
+    <noscript>
+        <h2>Javascript Disabled</h2>
+        <p>This page requires Javascript to be enabled on your browser. Please enable it and try again.</p>
+    </noscript>
+    <div id="cc-instructions">
+      <h4> 
+        <strong>Instructions:</strong> 
+      </h4> 
+      <ol> 
+        <li>To add, edit or remove content, click one of the links that appear to the right of each item when hovering over it.</li> 
+        <li>To rearrange items, simply drag and drop them to the desired location.</li> 
+      </ol> 
+    </div>
+
+    <div> 
+        <div id="coursetree"> 
+        </div> 
+    </div> 
+    <div id="coursetree-loading">
+        <img tal:attributes="src string:${portal_url}/++resource++collection-composer-resources/spinner.gif" />
+        <tal:span i18n:translate="loading">Loading</tal:span>
+    </div>
+    <div id="kss-spinner-base">
+        <img tal:attributes="src string:${portal_url}/++resource++collection-composer-resources/spinner.gif" />
+        <span i18n:translate="saving">Saving</span>
+    </div>             
+    </div>
+  </body>
+</html>
+
+</div>

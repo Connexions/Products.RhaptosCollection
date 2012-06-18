@@ -1,0 +1,14 @@
+[default]
+title=Publish
+
+[validators]
+validators..next = validate_license
+validators..publish = validate_collection_publish
+
+[actions]
+action.success..next = traverse_to:string:cc_license_prepub_accept
+action.confirm = traverse_to:string:confirm_publish
+action.failure = traverse_to_action:string:publish
+action.success..publish = traverse_to:string:publishContent
+action.success..submit = traverse_to:string:submitContent
+action.role_error = traverse_to_action:string:roles

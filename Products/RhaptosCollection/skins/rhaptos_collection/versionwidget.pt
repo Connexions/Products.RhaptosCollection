@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="rhaptos">
+      
+	<tal:comment>
+	i18n by: mhutch
+	</tal:comment>
+
+  <body>
+
+    <span class="field" metal:define-macro="view">
+    <metal:use use-macro="here/compactstring/macros/view">
+    </metal:use>
+    </span>
+
+    <metal:define define-macro="edit">
+    <metal:use use-macro="here/widgets/field/macros/edit">
+     <metal:fill metal:fill-slot="widget_body"
+                 tal:define="vocab python:field.Vocabulary(here);
+                             vlen python:len(vocab);
+                             value python:accessor()">
+      <div>
+       <input type="radio" name="fieldName" value="latest" class="noborder"
+              tal:attributes="name fieldName; checked python:test(value=='latest', 'true', None)" />
+              <span i18n:translate="help_version_use_newest">Always use newest version</span>
+      </div>
+      <div>
+       <input type="radio" name="fieldName" value="specific" class="noborder"
+              tal:attributes="name fieldName; checked python:test(value!='latest', 'true', None)" />
+              <span i18n:translate="help_version_lockat">Lock version at:</span>
+              <tal:comment tal:replace="nothing">
+                 I take the following from widgets/selection but ignore the format/size code.
+              </tal:comment>
+              <select id="specific" name="specific"
+                      tal:attributes="tabindex tabindex/next;
+                                      onfocus string:formtooltip('${fieldName}_help',1);
+                                      onblur string:formtooltip('${fieldName}_help',0);">
+                <option tal:repeat="item vocab"
+                        tal:attributes="value item;
+                                        selected python:test(here.checkSelected(item, value), 'selected', None);"
+                        tal:content="python: vocab.getValue(item)"
+                        i18n:translate="" />
+              </select>
+
+      </div>
+     </metal:fill>
+    </metal:use>
+    </metal:define>
+
+    <div metal:define-macro="search">
+      <div metal:use-macro="here/widgets/string/macros/search">
+      </div>
+    </div>
+
+  </body>
+
+</html>

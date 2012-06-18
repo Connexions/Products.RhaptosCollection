@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone">
+
+<head>
+    <title></title>
+</head>
+
+<body>
+
+    <!-- Master Selection Widgets -->
+
+    <metal:view_macro define-macro="view">
+        <metal:use_macro use-macro="here/widgets/masterselection/macros/view"/>
+    </metal:view_macro>
+
+    <metal:define define-macro="edit" i18n:domain="rhaptos">
+      <div metal:use-macro="here/module_metadata/macros/language_selection">
+        <metal:block metal:fill-slot="language_help">
+          <div class="formHelp"
+               tal:define="description python:widget.Description(here)"
+               tal:content="structure description"
+               tal:attributes="id string:${fieldName}_help"
+               i18n:translate="">
+            Select the primary language for this collection.
+          </div>
+        </metal:block>
+      </div>
+    </metal:define>
+
+    <div metal:define-macro="search">
+        <div metal:use-macro="here/widgets/masterselection/macros/search" />
+    </div>
+
+</body>
+
+</html>

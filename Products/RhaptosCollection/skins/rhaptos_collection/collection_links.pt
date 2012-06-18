@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n" xml:lang="en-US" lang="en-US"
+      metal:use-macro="here/module_template/macros/master"
+      i18n:domain="rhaptos">
+
+	<tal:comment>
+	i18n by: mhutch
+	</tal:comment>
+
+  <body>
+    <div metal:fill-slot="main">
+      <div metal:define-macro="panel" tal:define="links python:here.objectValues('Extended Link')">
+        <metal:macro metal:use-macro="container/module_links/macros/links_form" />
+      </div>
+    </div>
+  </body>
+</html>

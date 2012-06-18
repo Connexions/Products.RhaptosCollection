@@ -1,0 +1,171 @@
+<span tal:replace="structure string:<script type='text/javascript'>" />
+$(document).ready(function(){
+
+    var popup = $('div#collection-composer-popup');
+    $('input, select, textarea', popup).bind('change', function(){
+        $('div#collection-composer-popup').addClass('modified');
+    });
+
+    $('input#collection-composer-cancel').bind('click', function(event){
+        event.preventDefault();
+        popup.removeClass('modified');
+        composer_window.close();
+    });
+
+    var module_title_handler = function(event){
+        event.preventDefault();
+
+        var url = $(this).attr('action');
+        $('div#kss-spinner').show();
+        $.ajax({
+            type: 'POST',
+            url: url,
+            async: false,
+            data:  $('input:text, input:hidden, select, input:radio:checked', this).serialize(),
+            success: function(data){                                
+                if (data.indexOf('close:') == 0)
+                {                   
+                    // Update tree node and close popup
+                    var title = data.substring(6);
+                    var node = find_treenode(collection_composer_tree.getRootNode(), '<span tal:replace="context/getId" />');
+                    node.setText(title);
+                    $('div#collection-composer-popup').removeClass('modified');
+                    composer_window.close();
+                    return;
+                }
+                else
+                    $('div#<span tal:replace="view/__name__" />-body').html(data);
+            }  
+        }); 
+        $('div#kss-spinner').hide();
+
+        // Rebind
+        $('form#<span tal:replace="view/__name__" />-form').bind('submit', module_title_handler);
+    }
+
+    $('form#<span tal:replace="view/__name__" />-form').bind('submit', module_title_handler);    
+
+    // When a specific version is set, change the radio button
+    var form = $('form#<span tal:replace="view/__name__" />-form');
+    $('select[name="specific"]', form).focus(function(){
+        $('input[name="version"]', form).attr("checked", "true");
+    });
+});
+<span tal:replace="structure string:</script>" />
+
+<div class="cnx_popup" id="collection-composer-popup">
+    <div class="x-dlg-bd" id="collection-composer-subcollection-title-body">
+    <metal:macro define-macro="body">
+        <div class="popup_scale_fixer">
+
+            <h1 class="popup-header">
+                <img tal:attributes="src string:${context/portal_url}/module_icon.gif" alt="" title="" height="16" width="16" />
+                <span tal:replace="context/Title" />
+                <span class="normal-text-in-header">(<span tal:replace="context/getId" />)</span>
+            </h1>
+
+            <div style="margin-bottom: 1em;">
+                <span class="field" tal:define="modurl view/published_module_url">
+                    <a tal:attributes="href modurl"
+                       target="_blank" title="Opens in new window"
+                       i18n:attributes="title opens_in_new_window"
+                       i18n:translate="vist_published_module">Visit published module</a> 
+                    <a tal:attributes="href modurl"
+                       target="_blank">
+                        <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/external-link.png" 
+                             title="Opens in new window" 
+                             i18n:attributes="title opens_in_new_window"/></a>
+                </span>
+            </div>
+
+            <form tal:attributes="action string:${context/absolute_url}/@@${view/__name__};
+                                 id string:${view/__name__}-form">
+
+                <input name="form.submitted" 
+                       value="1" 
+                       type="hidden" />
+
+                <fieldset>
+                <legend i18n:translate="alternate_title">Alternate Title</legend>
+
+                <span class="field">
+                    <span class="label"><span i18n:translate="module_title">Module Title</span>:</span> 
+                    <span tal:replace="view/original_title" />
+                </span>
+
+                <div tal:define="error errors/optionalTitle|nothing"
+                     tal:attributes="class python:error and 'field error' or 'field'">
+                    <div tal:content="error"></div>
+                    <label for="optionalTitle" i18n:translate="alternate_title">Alternate Title</label>
+                    <div class="formHelp" i18n:translate="">
+                        An alternate name for this module, by which it will be displayed when 
+                        viewed as part of the collection.
+                    </div>
+                    <input tal:attributes="value request/optionalTitle|context/getOptionalTitle"
+                           name="optionalTitle" value="" size="30" tabindex="0" maxlength="255" type="text" />
+                </div>
+                </fieldset>
+
+                <fieldset>
+                <legend i18n:translate="set_version">Set Version</legend>
+
+                <div style="margin-bottom: 1em;">
+                    <span class="field" tal:define="histurl view/published_module_version_history_url">
+                        <a tal:attributes="href histurl" 
+                           target="_blank" title="Opens in new window"
+                           i18n:attributes="title opens_in_new_window"
+                           i18n:translate="visit_published_module_version_history">Visit published module version history</a> 
+                        <a tal:attributes="href histurl"
+                           target="_blank">
+                            <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/external-link.png" 
+                                 title="Opens in new window" 
+                                 i18n:attributes="title opens_in_new_window"/></a>
+                    </span>
+                </div>
+
+                <div tal:define="error errors/version|nothing"
+                     tal:attributes="class python:error and 'field error' or 'field'"
+                     style="margin-bottom: 0;">
+                    <label for="version" i18n:translate="version">Version</label>
+                    <span class="fieldRequired" title="Required" i18n:attributes="title required">
+                        (Required)
+                    </span>
+                    <div tal:content="error"></div>
+                </div>
+
+                <div>
+                    <input tal:attributes="checked python:request.get('version', context.getVersion()) == 'latest'"
+                           name="version" value="latest" class="noborder"
+                           type="radio" />
+                    <span i18n:translate="always_use_newest_version">Always use newest version</span>
+                </div>
+
+                <div>
+                    <input tal:attributes="checked python:request.get('version', context.getVersion()) != 'latest'"
+                           name="version" value="specific" class="noborder" 
+                           type="radio" />
+                    <span i18n:translate="lock_version_at">Lock version at</span>:
+                    <select tal:define="vocab context/moduleVersions"
+                            name="specific">
+                        <option tal:repeat="item vocab"
+                                tal:attributes="value item;
+                                                selected python:request.get('specific', context.getVersion()) == item"
+                                tal:content="python:vocab.getValue(item)"></option>
+                    </select>
+                </div>
+                </fieldset>
+
+                <input i18n:attributes="value save"
+                       name="save" class="standalone" type="submit" value="Save" />
+                <input i18n:attributes="value cancel"
+                       id="collection-composer-cancel"
+                       name="cancel" class="standalone" type="submit" value="Cancel" />
+            </form>
+
+        </div>
+    </metal:macro>
+    </div>
+</div>
+<div id="kss-spinner">
+    <img tal:attributes="src string:${context/portal_url}/++resource++collection-composer-resources/spinner.gif" />
+</div>

@@ -1,0 +1,499 @@
+RhaptosCollection-0.70
+  - add 'harvestable' boolean to allow exclusion of collections from OAI
+  - add 'size' field to query_ptool diagnostic page
+  - add 'extension' param to set/getPrintedFile method to allow for non-pdf files - change 'locked' status to lock all queued files
+
+RhaptosCollection-0.69
+  - permabrand
+
+RhaptosCollection-0.68
+  - modren-textbook release (xhtml+css, ccap word importer)
+
+RhaptosCollection-0.67
+  - oerpub m4 release (lenses, mostly)
+
+RhaptosCollection-0.66.1
+  - update google analytics domain code
+
+RhaptosCollection-0.66
+  - implement new-member publish review
+  - handle authors w/o a member account
+
+RhaptosCollection-0.65
+  - catalog fixes - make PublishedContentPointers uncatalogable
+
+RhaptosCollection-0.64
+  - caching
+
+RhaptosCollection-0.63
+  - twitbook buttons
+
+RhaptosCollection-0.62
+  - Sprint-2011 bugfixes
+
+RhaptosCollection-0.61
+  - Bugfix 2010  - navigation and language
+
+RhaptosCollection-0.60
+  - Ajax collection editor
+
+RhaptosCollection-0.59
+  - generate new epubs and offline, instead of multimedia zip
+  - include auto_upgraded cnxml for included modules
+
+RhaptosCollection-0.58.1
+  - modify query_ptool to handle modules, too.
+
+RhaptosCollection-0.56
+  - Google Analytics addition for file download
+
+RhaptosCollection-0.55.1
+  - change textarea wrap to soft.
+
+RhaptosCollection-0.55
+  - generic setup refactor. Rhaptos 2.0 release
+
+RhaptosCollection-0.54
+  - siyavula-phase-3 (11 Jan 2010)
+
+RhaptosCollection-0.53
+  - remove adhoc branding (05 Jan 2009)
+
+RhaptosCollection-0.52
+  - lwb-hot-fixes (03 Dec 2009)
+    - #9812: create branding banner bar and set branding cookie, server side
+
+RhaptosCollection-0.51
+  - fix-pdfs (Nov. 11, 2009)
+    - #9840: no longer access or move cached PDF and mulitmedia zip files attached directly to Collection objects
+
+RhaptosCollection-0.50
+  - light-weight-branding (30 Oct 2009)
+    - Moving banner-creation javascript to lensmaker since it's used in several products.
+    - added branding bar and logo markup to collection.
+
+RhaptosCollection-0.49
+  - collection-structure-redesign-1 (Oct. 22, 2009)
+    - Updated links to help files
+    - Supports XML in abstracts
+    - AsyncPrint removed, replaced with queue handling; triggerPrint and publish use queue instead
+    - some AsyncPring configuration paramers moved to RhaptosPrint
+    - removed some no-longer-needed properties from 'rhaptos_collection_print_config'
+    - added ZCTL queue handlers for: 
+    - 'printing' external moved to RhaptosPrint
+    - added CollXML creation view and template
+    - make Collections able to render MDML (added getMetadata, marked with IMDML interface)
+    - added/modified methods to create and fetch data products:
+       collxml, collxml zip, complete zip, latex zip, multimedia zip
+    - added ZCTL queue handlers for: MM zip, MMZ update, Col PDF+Latex, CollXML and CollXML zip, complete zip
+    - fix non-portal-based URLs in collection_view
+    - add import/export box to collection_view for CollXML export
+    - added widget for display of CNXML-rendered fields, to show validation info on edit
+    - collection_view provides CNXML-rendered abstracts
+    - Added Connexions userids of authors and licensors to collection RDF file.
+    - Added collection subjects and keywords to collection RDF file.
+    - 'multimediazip' method renamed to 'multimedia'
+    - register package through configure.zcml instead of code in __init__.py
+    - printedFile and resourcesZip properly use PrintTool for storage, and clear their attributes on use
+    - added 'enqueue' method to manually trigger enqueue of various data products
+    - PCP 'getLinks' now has parameter for optional next/prev links
+    - CollectionBase 'htmlContents' is joined by 'contentsTree' which is similar but provides
+       Python primitives instead of HTML. From contentperf-1
+
+RhaptosCollection-0.48.1
+  - Reinstate lost fix for #9231 (ampersands in lens comments)
+
+RhaptosCollection-0.48
+  - content-actions-move (17 Aug 2009)
+    - content actions portlet replaced with content actions bar (shared between
+      collection and module rendering)
+    - collection_view uses same content_type/XHTML decl. as module view for similarity of rendering
+    - book image added to collection view header
+    - add GoogleAnalyticsTrackingCode to collection metadata (edit) tab, with validation and derive logic
+    - Changed how objectId property was being accessed in setPrintFile() and setProcessStatus()
+    - #9397: Made "What is a lens?" links consistent.
+    - #9318: Added "Order printed Collection" button 
+
+RhaptosCollection-0.47.2 (04 Aug 2009)
+  - #9389: make setPrintedFile accept what getPrintedFile gives it
+
+RhaptosCollection-0.47.1 (03 Aug 2009)
+  - fix bad call to old getSize method that was breaking the order button
+
+RhaptosCollection-0.47
+  - contentperf-pdf (28 Jul 2009)
+    - Added logic to place collection PDF and Multimedia zip in RhaptosPrint tool
+    - Modified to insert new modules pdf and files into existing multimedia zip
+
+RhaptosCollection-0.45
+  - Module Edit Workflow (June 2009) [reinstall reqd (@Upgrades/upMew.zctl)]
+    - #8722: CMFFormController customizations for folder_*.cpy in GenericSetup, formerly of
+      RhaptosSite; requires reinstall
+    - #9183: Collection-composer column width issues
+  - #9232 (in its own devset) - naked & in Lens entry comments
+
+RhaptosCollection-0.44.1
+ - #9012: pencil.png skins name collision
+
+RhaptosCollection-0.44
+ - Siyavula Release (May 14, 2009)
+  - Added Approve portlet
+  - Added tags portlet
+  - Added endorsement icon in from new location
+
+RhaptosCollection-0.43
+  - Add Hewlett Google Analytics to all pages (ticket:8565)
+
+RhaptosCollection-0.42.1
+  - cnxml-0.6-hot-fix (06 Mar 2009)
+    - change printing external
+
+RhaptosCollection-0.42
+  - cnxml0.6 (30 Jan 2009) [requires QuickInstaller reinstall]
+    - change link ranges (retroactively) from 1-3 to 1-5 on upgrade
+
+RhaptosCollection-0.41
+  - print-v1.2 milestone (26 Nov 2008)
+    - include language in RDF for use by Vietnamese printing
+    - use printing 2.3
+  - ramcache (26 Nov 2008)
+    - refactor table of contents rendering to have an additional method 'toc_structure'
+      where the collapse cookie is read and passed into the rest of the machinery ('htmlContents'),
+      so that 'htmlContents' can be cached without wrongly caching cookie results
+    - call 'htmlContents' from portal instead of context, since it is not context-dependent and
+      context is taken as a variable by RAMCache
+    - set 'htmlContents' to be RAMcached in cache created by RhaptosRepository
+    - 'getContributors' refactored to use new content catalog metadata (from RhaptosRepository change)
+      to be very much faster (this and ToC were making larger collections v. slow)
+    - set 'getContributors' to be RAMcached in cache created by RhaptosRepository
+  - vocw-fixes (26 Nov 2008)
+    - moved AccessControl on subject widget here, so Rhaptos installs get it
+    - added lastPageBlurb property and output page
+
+RhaptosCollection-0.40.2
+  - #6505: default to /latest in parameter-based-view
+
+RhaptosCollection-0.40.1
+  - quickperf (30 Sept 2008)
+    - add metadata file to transmenus and other js files in order to specify cache handler association
+
+RhaptosCollection-0.40
+  - MyCNX phase 2
+    - Modified link to read Start from... instead of Skip to...
+    - AddThis popup window does not cover lower links
+    - prep for #6505: allow no version on context-by-param (commented out)
+    - #6529: returned "Collection" to the PDF and multimedia zip labels
+    - #6496: "Login required" tool tip for "My Favorites"/"A lens" link restored (anonymous only)
+    - #6484: My Favorites dialog box gets a distinct title
+    - #6591: AddTo hover location fixed
+    - #6262: collection page gets collapsible Table of Contents, like modules
+    - refactor getCourseParameters to current_collection to allow just finding context
+    - #6382, #6572: add last-read feature using My Favorites
+    - add additional slot in search_macros to accomodate line from #6572
+    - make Transmenus arrows root-based instead of relative, for caching
+    - always use explicit versions in recently viewed to deal with latest vs latest version (#6380)
+    - #6493: remove clickable-looking icons from pop-ups
+    - #6376: Removed problem-causing quotation marks from author contact mailtos and shorten them
+
+RhaptosCollection-0.39.1
+ - bugfix in printing subsystem. See CHANGES.txt for printing v2.2.2.
+
+RhaptosCollection-0.39
+ - made collection_view a cpt file
+ - modified logic to display Order Printed Copy button
+ - added script to determine if collection should use new print confirmation page
+ - added collection_print_confirmation.cpt for collections that are not part of cnxbooks lens
+   - added validation script for collection_print_confirmation 
+
+RhaptosCollection-0.38
+  - Fix an issue with Collection abstracts being copied inappropriately
+
+RhaptosCollection-0.37.1
+  - moved logic for reprint/carry-forward-if-locked from Repository into Collection (due to #6343)
+  - #6343: fixed case where publishing module deleted multimedia zip on its collections
+    (which is bad when it's locked.)
+  - also #6343: preserve orderable flag on checkout, so it's not lost on republish
+  - change many-strings-added-together for zip file index HTML file into triple-quoted string
+  - add method to allow admin (at least through debug prompt) to regenerate stored multimedia zip file
+  - #6535: added printinfo_all to get some info for all collections in sortable table
+
+RhaptosCollection-0.37
+  - MyCNX lands
+    - Lens/Favorites fix (language widget description not hard-coded)
+    - collection context through parameter (for recently viewed)
+    - new content actions/favorite/recently viewed changes on collection_view
+
+RhaptosCollection-0.36.3
+  - Added Google Analytics JavaScript code to col10522 and its contained modules
+  - Incorporated printing bugfixes (printing v2.2.1)
+
+RhaptosCollection-0.36.2
+  - upgrade of printing subsystem. See printing/CHANGES.txt
+
+RhaptosCollection-0.36.1
+  - fix #6038: old-version message on collections had broken link
+
+RhaptosCollection-0.36
+  - major accessibility release:
+    - various semantic mark-up improvements on collection pages (headers, 
+      alt attributes, <div>s to <p>s, etc.)
+    - added hidden text in several places to make the page easier to 
+      understand for a screen reader user
+    - #5726: make lens pop-ups easier to read and find for screen reader users
+    - #5312: add support for same-page "skip to" links on collection page
+    - #5734: make initial hide of lensinfo hover boxes be with .hiddenStructure instead of display:none for
+      screen reader use (they don't trigger mouseover events)
+    - #5737: fix table-of-contents UL/UL nesting
+    - #5737: table-of-contents headers now increment from H4 to H6
+  - attribution policy improvements
+    - #5749: add clarification of what one's agreeing to when publishing
+    - #5749: add clarification about attribution license on content publish page
+  - foldable table of contents
+    - #5605: table of contents gains TransMenus node expansion (with global cookie, pending path-based-view)
+      (also some minor collection composer and visited-link styling changes)
+    - #5814: table of contents gets chapter numbering for textbook collection types
+  - #5728: sample typefaces in collection_parameters (r22636)
+
+RhaptosCollection-0.35.3
+  - bump version of printing for removal of -e from imagefix call
+
+RhaptosCollection-0.35.2
+  - bump version of printing for } fix
+
+RhaptosCollection-0.35.1
+  - fix #4296 and #4993: make printing config have smart defaults and also not depend on changes to the Makefile;
+    application of this will will probably require setting the new "Download Host" on RCPrinter to 'cnx.org'
+
+RhaptosCollection-0.35
+  - add boolean for book-order button on individual collections
+
+RhaptosCollection-0.34.3
+  - fix #5248: previous change broke custom styled courses 
+
+RhaptosCollection-0.34.2
+  - fix #5193: fix TOC encoding bug introduced in last rollout
+
+RhaptosCollection-0.34.1
+  - fix #4227: remove tal recursion for TOC in favor of python code on the type
+
+RhaptosCollection-0.34
+  - enable and restyle/rework lens hover boxes; lenses1 branch merged
+  - fix #4960: SubCollection view alias setting not properly present
+
+RhaptosCollection-0.33
+  - add Qoop auto-created purchase link, and property to control it
+  - fine-tune printinfo, including property-izing two fields
+  - set up special permission for printing
+  - requires reinstall
+
+RhaptosCollection-0.32.1
+  - printing external at v1.5.
+
+RhaptosCollection-0.32
+  - assemble-on-demand branch lands; asynchronous printing object, triggers,
+    idempotent reinstall, external to 'printing', etc
+
+RhaptosCollection-0.31
+  - upgrade to Plone 2.5
+  - use post in buy link to preserve GET-style parameters in the link
+
+RhaptosCollection-0.30
+  - Changes to use results set common macros.
+
+RhaptosCollection-0.29.1
+  - Fix v0.29's bug with printing modules from within collections
+
+RhaptosCollection-0.29
+  - Now handles multiple collection types instead of hard coding
+    'Course' for most cases
+  - Also switch from using 'Course' as the default label of
+    collections to using 'Collection'
+  - Allow subjects to be edited on Collections
+
+RhaptosCollection-0.28
+  landing lenses0 branch
+  - Language widget made the same across RME, RC, and Lenses
+  - follow change of search_macros param inCourse to inContext
+  - add content actions box with "Add to a lens" to collection_view
+  - add lens display portlets to collection_view
+  - name "Webpage" and similar to "Web page"
+
+RhaptosCollection-0.27.5
+  - Change book-buy link to button
+
+RhaptosCollection-0.27.4
+  - Add hook for book-buy link to collection_view; CNX-only upgrade script adds link to col10040
+
+RhaptosCollection-0.27.3
+  - Fix for problem with content viewing looking bad in IE w/o JavaScript
+  - Script and code to eliminate leading/trailing whitespace in institutions
+
+RhaptosCollection-0.27.2
+  - remove batching from the folder listing at the top of the collection composer panel
+  - fix several abstract display issues
+  - nlt0225: use "summary" instead of "abstract"
+  - text size fix for search button within course composer
+  - style tweaks for parameters page in IE
+
+RhaptosCollection-0.27.1
+  - course composer ordering permanent fix
+  - course composer bullet fix
+  - subject-persistence fix
+
+RhaptosCollection-0.27
+  - March 2007 site redesign (newlook)
+  - major search refactoring and improvements
+  - new content browse structures
+
+RhaptosCollection-0.26
+  - addition of optional roles (currently Editor and Translator)
+
+RhaptosCollection-0.25
+ - i18n Translation Support
+
+RhaptosCollection-0.24
+ - adhoc-branding branch merged;
+   - adds a 'collectionType' parameter, the value of which, if present, 
+     replaces 'Course' in the collection_view template
+   - getCourseParameters forced to pass out specific style properties; this
+     can go away when pathBasedView lands
+ - Removed now unnecessary forced white-space behavior
+
+RhaptosCollection-0.23
+ - Added an upgrade script to fix a bug that occaisionally crops up
+ that prevents courses from being edited.
+ - Fixed PublishedContentPointer.py to use the new, slightly different
+ API for getHistory(), which requires the id to be passed in
+
+RhaptosCollection-0.22.1
+ - Changed the word 'Locale' to 'Dialect (optional)' (Max and Stefan's 
+   suggestions - bug #2315)
+
+RhaptosCollection-0.22
+  - collection_publish, collection_parameters, collection_view updated to no 
+    longer preserve the structure (and thus display HTML) of the title
+
+RhaptosCollection-0.21
+  - initial language support
+
+RhaptosCollection-0.20
+  - Nicer merge conflict error message (task 1379, bugday, kclarks)
+
+RhaptosCollection-0.19.1
+  - Fixed potential bug by casting roles to the same type
+
+RhaptosCollection-0.19
+  - Updated to work with new role request format
+  - Changed the behavior of roles when forking
+
+RhaptosCollection-0.18
+  - Conversion to new Connexions logo               
+
+RhaptosCollection-0.17
+  - Changed author names to link to the new member profile page
+
+RhaptosCollection-0.16
+  - Renamed Product
+
+RisaCollection-0.15
+  - Fix #2048: cookies from deleted courses cause KeyError
+  - Fix course display page when it includes broken modules
+
+RisaCollection-0.14
+  - Removed redirects from checkout() method now that it is handled
+    correctly in the skin
+
+RisaCollection-0.13
+  - Moved getCourseParameters script here
+  - Declare shlex safe for importing in skins since we use it
+
+RisaCollection-0.12
+  - used desecured version of getMemberById for 'authornames' method
+
+RisaCollection-0.11
+  - improved mark-up of course pages by putting in links to "Start 
+    Course" and "Course Website" inside h3 and h4 headers
+
+RisaCollection-0.10
+  - Work with (and require) Plone2 and AT-1.3
+
+RisaCollection-0.9
+  - Support Creative Commons Attribution License 2.0
+
+RisaCollection-0.8
+ - sorting keywords now
+
+RisaCollection-0.7
+ - New Content look and feel
+ - added the "not in the last version" warning (collection_view.pt)
+
+RisaCollection-0.6.1
+ - Really fix (sort-of) bug 1614 (contributing author sort)
+ - Fixes broken preview for some new courses (bugs 1872, 1868)
+
+RisaCollection-0.6
+ - Fix 1625: "Add items to:" title on search results
+ - Fix (sort-of) bug 1614: sort the contributing authors
+ - Fix 1694: link to better netscape page for download
+ - Fix 1582: collections should not report a size since they don't
+ really contain anything
+ - Updated to use new search_form_handler() script from RisaRepository
+
+RisaCollection-0.5
+  - Don't allow publishing if state is published (tagged as 0.4.1)
+  - Small performance boost for TOC page
+
+RisaCollection-0.4
+  - Confirmation page when publishing new course
+  - Upgrades to work with new CNXPloneSite
+
+RisaCollection-0.3
+  - Use new RisaRepository API
+  - Use Links from LinkMapTool
+
+RisaCollection-0.2.2
+  - Fixed problem with RDF roadmap link in preview
+
+RisaCollection-0.2.1
+  - Fixing badly named getContainedObject in two places
+
+RisaCollection-0.2
+  - New course view disply using content templates
+
+RisaCollection-0.1.6
+  - Default authors field on forked courses to include original authors
+
+RisaCollection-0.1.5
+  - Server side assistance on hiding ULs in the tree, to reduce redraw
+  - Correctly set properties when checking out a course
+  - Replace two notation images with better ones
+  - Remove red dashed borders in IE by fixing bad comments in css
+
+RisaCollection-0.1.4
+  - Highlight chasing for TransMenus tree
+  - Using Javascript-safe UIDs for node ids to ensure
+    consistent expansion
+  - Fixing improper persistence when going up the tree
+    (cookie path is now set to course path)
+  - Fix for bad paste error message when used in conjunction with
+    RME-0.23.1
+  - Fix for bug where type of newly added link always appeared as Example
+  - Fix for RDF: include module ID
+  - Enable link to course forking
+
+RisaCollection-0.1.3
+  - Fixed link mismatch problem
+  - Spacing tweaks
+  - Fixes for navtree jitter (don't display default bullets first)
+  - Put default parameters in first column
+
+RisaCollection-0.1.2
+  - Fix bug with 0.1.1 in adding content pointers to a course
+  - Improvements to tree twisties
+  - Added title for parameters page
+
+RisaCollection-0.1.1
+  - Performance improvements on checkout
+
+RisaCollection-0.1
+  - Initial release

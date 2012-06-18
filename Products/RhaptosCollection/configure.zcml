@@ -1,0 +1,42 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+           i18n_domain="rhaptos">
+
+  <genericsetup:registerProfile
+      name="default"
+      title="Products.RhaptosCollection"
+      directory="profiles/default"
+      description="Extension profile for Products.RhaptosCollection."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <include package=".browser" />
+
+<!-- we get a modified event on create; no need to double up
+  <subscriber
+      for="Products.RhaptosCollection.interfaces.ICollectionContained
+           zope.app.container.interfaces.IObjectAddedEvent"
+      handler=".eventHandlers.collectionContentsModified"
+      />
+-->
+
+  <subscriber
+      for="Products.RhaptosCollection.interfaces.ICollectionContained
+           zope.app.container.interfaces.IObjectModifiedEvent"
+      handler=".eventHandlers.collectionContentsModified"
+      />
+
+<!-- handled by content_delete_post
+  <subscriber
+      for="Products.RhaptosCollection.interfaces.ICollectionContained
+           zope.app.container.interfaces.IObjectRemovedEvent"
+      handler=".eventHandlers.collectionContentsModified"
+      />
+-->
+
+  <!-- Interface marking -->
+  <content class=".types.Collection.Collection">
+    <implements interface="Products.CNXMLDocument.newinterfaces.ICNXMLAbstract" />
+  </content>
+
+</configure>

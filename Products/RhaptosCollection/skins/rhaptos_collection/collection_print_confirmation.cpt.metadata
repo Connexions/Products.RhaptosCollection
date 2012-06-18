@@ -1,0 +1,9 @@
+[default]
+title=Collection Print Confirmation
+
+[validators]
+validators=validate_collection_print_confirmation
+
+[actions]
+action.success=traverse_to:string:redirectToCollectionPublisher
+action.failure=traverse_to:string:collection_print_confirmation

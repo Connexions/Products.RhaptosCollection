@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="here/module_template/macros/master"
+      i18n:domain="rhaptos">
+
+   <metal:css metal:fill-slot="css_slot">
+     <link rel="stylesheet" href="/collection_metadata.css" type="text/css" title="Default" media="screen"
+           tal:attributes="href string:$portal_url/collection_metadata.css" />
+     <link rel="stylesheet" href="/language_locale.css" type="text/css" title="Language" media="screen"
+           tal:attributes="href string:$portal_url/language_locale.css" />
+   </metal:css>
+
+  <body>
+    <div metal:fill-slot="main"
+         tal:define="errors options/state/getErrors;
+                     schematas here/Schemata;
+                     fieldsets python:[key for key in schematas.keys() if key != 'metadata'];
+                     default_fieldset python:(not schematas or schematas.has_key('default')) and 'default' or fieldsets[0];
+                     fieldset request/fieldset|options/fieldset|default_fieldset;">
+
+      <h2 i18n:translate="heading_edit_module_metadata">Edit collection metadata</h2>
+
+      <form name="edit_form"
+            method="post"
+            enctype="multipart/form-data"
+            action=""
+            tal:attributes="action python:context.absolute_url()+'/'+template.id">
+
+        <fieldset> <!-- Collection Details -->
+
+          <legend tal:define="iconname python:context.getIcon(1);
+                              icon     python:context.portal_url() + '/' + iconname">
+
+              <tal:legend define="fieldset python:(len(fieldsets) &gt; 1 and fieldset != 'default') and fieldset">
+                <tal:fieldset i18n:translate="legend_fieldset_details"
+                              tal:condition="fieldset">
+                  <span i18n:name="fieldset">
+                    <span i18n:translate=""
+                          tal:content="fieldset" />
+                  </span>
+                  Details
+                </tal:fieldset>
+                <tal:type i18n:translate="legend_type_details"
+                          tal:condition="not:fieldset">
+                  <span i18n:name="type" tal:define="fti python:context.portal_types.getTypeInfo(here)">
+                    <span i18n:translate=""
+                          tal:content="fti/title_or_id" />
+                  </span>
+                  Details
+                </tal:type>
+              </tal:legend>
+
+          </legend>
+
+          <!-- listing of the fields -->
+          <metal:fieldMacro use-macro="python:context.widget('title', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('master_language', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('collectionType', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('subject', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('keywords', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('abstract', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('orderable', mode='edit')"/>
+          <metal:fieldMacro use-macro="python:context.widget('harvestable', mode='edit')"/>
+
+        </fieldset>
+
+        <fieldset> <!-- Visitor Tracking -->
+          <legend i18n:translate="legend_collection_visitor_tracking">
+            Visitor Tracking
+          </legend>
+
+          <metal:fieldMacro use-macro="python:context.widget('GoogleAnalyticsTrackingCode', mode='edit')"/>
+        </fieldset>
+
+        <fieldset> <!-- Special-Purpose Fields -->
+
+          <legend i18n:translate="legend_collection_special_fields">
+            Special-Purpose Fields
+          </legend>
+
+          <p i18n:translate="description_collection_special_fields">These
+            fields are primarily useful for collections of the "course"
+            subtype, but may be used on any collection if
+            desired. Display of these fields may vary slightly by
+            subtype, so be sure to preview your collection before
+            publishing. 
+          </p>
+
+          <table>
+            <tr valign="top">
+              <td>
+                <metal:fieldMacro use-macro="python:here.widget('homepage', mode='edit')"/>
+              </td>
+              <td>
+                <metal:fieldMacro use-macro="python:here.widget('code', mode='edit')"/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <metal:fieldMacro use-macro="python:here.widget('institution', mode='edit')"/>
+              </td>
+              <td>
+                <metal:fieldMacro use-macro="python:here.widget('instructor', mode='edit')"/>
+              </td>
+            </tr>
+          </table>
+
+        </fieldset>
+
+        <metal:block tal:define="fieldset_index python:fieldsets.index(fieldset);
+                                 n_fieldsets python:len(fieldsets)">
+          <input tal:condition="python:fieldset_index &gt; 0"
+                 class="context"
+                 tabindex=""
+                 type="submit"
+                 name="form_previous"
+                 value="Previous"
+                 i18n:attributes="value"
+                 tal:attributes="tabindex tabindex/next;
+                                 disabled python:test(isLocked, 'disabled', None);"
+                       />
+          <input tal:condition="python:fieldset_index &lt; n_fieldsets - 1"
+                 class="context"
+                 tabindex=""
+                 type="submit"
+                 name="form_next"
+                 value="Next"
+                 i18n:attributes="value"
+                 tal:attributes="tabindex tabindex/next;
+                                 disabled python:test(isLocked, 'disabled', None);"
+                       />
+          <input class="context"
+                 tabindex=""
+                 type="submit"
+                 name="form_submit"
+                 value="Save"
+                 i18n:attributes="value"
+                 tal:attributes="tabindex tabindex/next;
+                                 disabled python:test(isLocked, 'disabled', None);"
+                       />
+          <input class="standalone"
+                 tabindex=""
+                 type="submit"
+                 name="form.button.cancel"
+                 value="Cancel"
+                 i18n:attributes="value"
+                 tal:attributes="tabindex tabindex/next"
+                       />
+        </metal:block>
+
+        <div class="formControls">
+
+          <input type="hidden"
+                 name="fieldset"
+                 value="default"
+                 tal:attributes="value fieldset"
+                 />
+          <input type="hidden"
+                 name="form.submitted"
+                 value="1"
+                 />
+          <input type="hidden"
+                 name="add_reference.field:record"
+                 value=""
+                 />
+          <input type="hidden"
+                 name="add_reference.type:record"
+                 value=""
+                 />
+          <input type="hidden"
+                 name="add_reference.destination:record"
+                 value=""
+                 />
+
+          <tal:env define="env request/controller_state/kwargs">
+            <tal:loop repeat="varname python:('reference_source_url', 'reference_source_field', 'reference_source_fieldset')">
+              <tal:reference define="items python:env.get(varname, request.get(varname))"
+                             condition="items">
+                <input tal:repeat="item items"
+                       type="hidden"
+                       name="form_env.reference_source_url:list:record"
+                       value="value"
+                       tal:attributes="value item;
+                                       name string:form_env.${varname}:list:record"
+                       />
+              </tal:reference>
+            </tal:loop>
+          </tal:env>
+
+          <tal:comment replace="nothing">
+            Turn 'persistent_' variables from controller_state persistent
+          </tal:comment>
+          <tal:env repeat="env request/controller_state/kwargs/items">
+            <input type="hidden"
+                   name="key"
+                   value="value"
+                   tal:define="key python:env[0];
+                               value python:env[1]"
+                   tal:condition="python:key.startswith('persistent_')"
+                   tal:attributes="name string:form_env.${key}:record;
+                                   value value"
+                   />
+          </tal:env>
+
+          <tal:comment replace="nothing">
+            Turn 'persistent_' variables from forms (GET/POST) persistent
+          </tal:comment>
+          <tal:env repeat="env request/form">
+            <input type="hidden"
+                   name="key"
+                   value="value"
+                   tal:define="key env;
+                               value request/?env"
+                   tal:condition="python:key.startswith('persistent_')"
+                   tal:attributes="name string:form_env.${key}:record;
+                                   value value"
+                   />
+          </tal:env>
+
+          <tal:comment replace="nothing">
+            Store referrer to remember where to go back
+          </tal:comment>
+          <input type="hidden"
+                 name="last_referer"
+                 tal:define="last_referer python:here.session_restore_value('HTTP_REFERER', request.form.get('last_referer', request.get('HTTP_REFERER')))"
+                 tal:attributes="value python:(last_referer and '%s/%s' % (here.absolute_url(), template.id) not in last_referer) and last_referer or here.aq_parent.absolute_url()"
+                 />
+
+          </div>
+
+      </form>
+
+    </div>
+
+  </body>
+
+</html>

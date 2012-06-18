@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<rdf:RDF
+  xmlns:cc="http://web.resource.org/cc/"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  xmlns:cnx="http://cnx.rice.edu/contexts#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+  tal:define="dummy python:request.RESPONSE.setHeader('Content-Type', 'application/xml;;charset=utf-8')" 
+  i18n:domain="rhaptos"
+>
+<tal:comment tal:replace="nothing">
+  i18n by cbearden@rice.edu
+</tal:comment>
+  <!-- Course Object -->
+  <rdf:Description about="urn:context:root">
+    <cc:license tal:attributes="rdf:resource here/license" />
+    <cnx:class>context</cnx:class>
+    <cnx:type>Course</cnx:type>
+    <cnx:name tal:content="here/Title">Title</cnx:name>
+    <cnx:uri tal:content="here/url">URL</cnx:uri>
+    <cnx:created tal:content="here/created">Creation date</cnx:created>
+    <cnx:revised tal:content="here/revised">Revision date</cnx:revised>
+    <cnx:homepage tal:content="here/getHomepage">homepage url</cnx:homepage>
+    <cnx:language tal:content="here/getLanguage">language</cnx:language>
+    <cnx:annotations tal:content="here/annotations_url">annotatations url</cnx:annotations>
+    <cnx:institution tal:condition="here/getInstitution" tal:content="here/getInstitution">institution</cnx:institution>
+    <cnx:instructor tal:condition="here/getInstructor" tal:content="here/getInstructor">instructor</cnx:instructor>
+    <cnx:code tal:condition="here/getCode" tal:content="here/getCode">CODE101</cnx:code>
+    <cnx:description tal:content="here/getAbstract">Abstract</cnx:description>
+    <cnx:author>
+      <rdf:Bag>
+	<rdf:li tal:repeat="p here/authors">
+	  <cnx:fullname tal:define="m python:here.desecured.getMemberById(p)" 
+                        tal:attributes="userid p"
+	                tal:content="m/fullname">[fullname]</cnx:fullname>
+	</rdf:li>
+      </rdf:Bag>
+    </cnx:author>
+    <cnx:licensor>
+      <rdf:Bag>
+        <rdf:li tal:repeat="p here/licensors">
+          <cnx:fullname tal:define="m python:here.desecured.getMemberById(p)" 
+                        tal:attributes="userid p"
+                        tal:content="m/fullname">[fullname]</cnx:fullname>
+        </rdf:li>
+      </rdf:Bag>
+    </cnx:licensor>
+    <cnx:parameters>
+      <rdf:Bag>
+	<rdf:li tal:repeat="param python:here.getParameters().items()">
+          <cnx:parameter tal:attributes="name python:param[0];
+                                         value python:param[1]"
+                         name="printfont" value="computermodern"/>
+	</rdf:li>
+      </rdf:Bag>
+    </cnx:parameters>
+    <cnx:subjects>
+      <rdf:Bag>
+        <rdf:li tal:repeat="subject here/getSubject">
+          <cnx:subject tal:content="subject"/>
+        </rdf:li>
+      </rdf:Bag>
+    </cnx:subjects>
+    <cnx:keywords>
+      <rdf:Bag>
+        <rdf:li tal:repeat="keyword here/keywords">
+          <cnx:keyword tal:content="keyword"/>
+        </rdf:li>
+      </rdf:Bag>
+    </cnx:keywords>
+    <!-- Linktypes for this context -->
+    <cnx:linktypes>
+      <rdf:Bag about="urn:context:linktypes">
+        <rdf:li>
+          <rdf:Description about="urn:context:linktypes:supplemental">
+            <cnx:defaultstrength>3</cnx:defaultstrength>
+            <cnx:name>Supplemental</cnx:name>
+            <cnx:description i18n:translate="description_rdf_supplmental">
+              A link to supplemental material which may be more indepth than
+              the current module.
+            </cnx:description>
+          </rdf:Description>
+        </rdf:li>
+
+        <rdf:li>
+          <rdf:Description about="urn:context:linktypes:prerequisite">
+            <cnx:defaultstrength>3</cnx:defaultstrength>
+            <cnx:name>Prerequisite</cnx:name> 
+            <cnx:description i18n:translate="description_rdf_prerequisite">
+              A link to prerequisite material which may be necessary to
+              understand the current module.
+            </cnx:description>
+          </rdf:Description>
+        </rdf:li>
+
+        <rdf:li>
+          <rdf:Description about="urn:context:linktypes:example">
+            <cnx:defaultstrength>3</cnx:defaultstrength>
+            <cnx:name>Example</cnx:name> 
+            <cnx:description i18n:translate="description_rdf_example">
+              A link to example material.
+            </cnx:description>
+          </rdf:Description>
+        </rdf:li>
+
+        <rdf:li>
+          <rdf:Description about="urn:context:linktypes:previous">
+            <cnx:defaultstrength>5</cnx:defaultstrength>
+            <cnx:name>Previous</cnx:name> 
+            <cnx:description i18n:translate="description_rdf_previous">
+              The previous module in the sequence of the course.
+            </cnx:description>
+          </rdf:Description>
+        </rdf:li>
+
+        <rdf:li>
+          <rdf:Description about="urn:context:linktypes:next">
+            <cnx:defaultstrength>5</cnx:defaultstrength>
+            <cnx:name>Next</cnx:name> 
+            <cnx:description i18n:translate="description_rdf_next">
+              The next module in the sequence of the course.
+            </cnx:description>
+          </rdf:Description>
+        </rdf:li>
+      </rdf:Bag>
+    </cnx:linktypes>
+
+    <!-- Children -->
+    <cnx:children>
+       <rdf:Seq>
+         <rdf:li tal:repeat="r_name here/children_resources" resource="" tal:attributes="resource r_name"/>
+       </rdf:Seq>
+    </cnx:children>
+  </rdf:Description>
+  <cc:License tal:attributes="rdf:about here/license">
+    <cc:requires rdf:resource="http://web.resource.org/cc/Attribution" />
+    <cc:permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+    <cc:permits rdf:resource="http://web.resource.org/cc/Distribution" />
+    <cc:permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+    <cc:requires rdf:resource="http://web.resource.org/cc/Notice" />
+  </cc:License>
+  <!-- End context object -->
+
+  <tal:block tal:repeat="elt here/children">
+    <span metal:use-macro="template/macros/group"/>
+    <span metal:use-macro="template/macros/module"/>
+  </tal:block>
+
+<tal:macros tal:replace="nothing">
+<metal:group metal:define-macro="group" tal:condition="exists:elt/aq_explicit/isGroup">
+  <rdf:Description tal:attributes="ID elt/resourcename">
+    <cnx:class>group</cnx:class>
+    <cnx:name tal:content="elt/Title">chaptername</cnx:name>
+    <cnx:children>
+       <rdf:Seq>
+         <rdf:li tal:repeat="r_name elt/children_resources" resource="" tal:attributes="resource r_name"/>
+       </rdf:Seq>
+    </cnx:children>
+  </rdf:Description>
+  <tal:block tal:repeat="elt elt/children">
+    <span metal:use-macro="template/macros/group"/>
+    <span metal:use-macro="template/macros/module"/>
+  </tal:block>
+</metal:group>
+
+<metal:module metal:define-macro="module" tal:condition="exists:elt/aq_explicit/isModule">
+  <rdf:Description tal:define="content elt/getContent" about="urn:context:content:id" tal:attributes="about elt/resourcename">
+    <cnx:class>module</cnx:class>
+    <cnx:id tal:content="elt/getModuleId">[id]</cnx:id>
+    <cnx:name tal:content="elt/Title">name</cnx:name>
+    <cnx:uri tal:content="content/url | nothing">URL</cnx:uri>
+    <cnx:author>
+      <rdf:Bag>
+	<rdf:li tal:repeat="p content/authors">
+	  <tal:name tal:define="m python:here.desecured.getMemberById(p)" 
+	            tal:content="m/fullname">[fullname]</tal:name>
+	</rdf:li>
+      </rdf:Bag>
+    </cnx:author>
+    <cnx:links tal:define="context here/url">
+      <rdf:Bag>
+        <rdf:li tal:repeat="link python:content.getContextLinks(context)">
+          <rdf:Description>
+            <cnx:type tal:content="string:urn:context:linktypes:${link/type/lower}">urn:context:linktypes:TYPE</cnx:type>
+            <cnx:title tal:content="link/title">title</cnx:title>
+            <cnx:target tal:content="link/url">target</cnx:target>
+            <cnx:strength tal:content="link/strength">strength</cnx:strength>
+          </rdf:Description>
+        </rdf:li>
+      </rdf:Bag>
+    </cnx:links>
+  </rdf:Description>
+</metal:module>
+</tal:macros>
+</rdf:RDF>

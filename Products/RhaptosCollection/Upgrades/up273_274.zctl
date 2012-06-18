@@ -1,0 +1,4 @@
+app.plone.content['col10040'].manage_addProperty('buyLink',
+                                                 'http://www.sqoop.com/corp_libraries/CNX/fundElecEngr.php',
+                                                 'string')
+get_transaction().commit()

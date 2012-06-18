@@ -1,0 +1,35 @@
+from Products.CMFCore.tests.base.security import AnonymousUser, OmnipotentUser
+from AccessControl.SecurityManagement import newSecurityManager
+user = OmnipotentUser().__of__(app)
+newSecurityManager(None, user)
+
+print
+print "Starting..."
+
+m = app.plone.portal_catalog(portal_type="Collection", path="/plone/Members")
+g = app.plone.portal_catalog(portal_type="Collection", path="/plone/GroupWorkspaces")
+all = m+g
+tofix = [x for x in all if len(x.getId)==8]
+
+broken = []
+
+for brain in tofix:
+    col = brain.getObject()
+    try:
+      col.setAbstract(col.abstract._getCopy(col))
+    except TypeError:
+      broken.append(brain.getPath())
+      # we presume that abstract is oldBaseUnit
+
+if broken:
+    print "Upgrade has detected some unmigrated oldBaseUnit values for abstract:"
+    for x in broken:
+        print x
+    print "We recommend you fix these and run this script again. See fixOldBaseUnit.zctl for details."
+
+    # we can't do this all in one script, because to extract the data we need to monkeypatch
+    # oldBaseUnit into existance, and if we do that, then we can't detect the failures. So: two step process.
+
+print "Done"
+import transaction
+transaction.commit()

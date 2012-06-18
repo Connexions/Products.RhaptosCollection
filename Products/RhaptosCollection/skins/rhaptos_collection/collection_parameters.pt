@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"
+      xmlns:m="http://www.w3.org/1998/Math/MathML"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="container/module_template/macros/master"
+      i18n:domain="rhaptos">
+      
+	<tal:comment>
+	i18n by: mhutch
+	</tal:comment>
+  
+  <body>
+    
+    <style metal:fill-slot="css_slot" type="text/css">
+      table td.default {
+        background: transparent;
+        <!-- #ffd -->
+      }
+
+      table.parameters td {
+        white-space: nowrap;
+        border-bottom: 1px solid #8CACBB;
+      }
+
+      table.parameters td img {
+        margin-left: 0.75em;
+      }
+
+      table.parameters td.caption {
+        white-space: nowrap;
+        background: #F7F9FA;
+        text-align: right;
+      }
+
+      table.parameters tr.firstrow th {
+        font-size: 130%;
+        font-weight: bold;
+        padding: 0.5ex 0ex;
+      }
+
+      #fonts td{
+        padding: .5em 1em;
+      }
+
+    </style>
+
+    <div metal:fill-slot="main" tal:define="errors python:request.get('errors', {})">
+
+      <h2 i18n:translate="set_courseparam_course">Set collection parameters</h2>
+
+      <p i18n:translate="description_courseparam_instrs">
+	  Please select display parameters for your course.  The
+	  defaults are in the first column of each row<!--shown with a yellow background-->.
+	</p>
+      
+	<form method="post" action="updateParameters">
+      
+	<tal:block tal:define="parameters here/getParameters">
+	  <table class="listing parameters" align="center" id="fonts">
+	    <tr class="firstrow">
+	      <th colspan="7" i18n:translate="listingheader_courseparam_print">Print Parameters</th>
+	    </tr>
+
+            <tr tal:define="paramValue parameters/printstyle | string:">
+              <td class="caption" width="33%" i18n:translate="help_courseparam_printstyle">Style</td>
+              <td class="default" colspan="6">
+                <select name="printstyle">
+                  <option value="" tal:attributes="selected python:test(paramValue=='', 'true', '')">LaTeX</option>
+                  <tal:alternatives repeat="alt context/rhaptos_print/getAlternateStyles">
+                    <option tal:attributes="value alt/id; selected python:test(paramValue==alt['id'], 'true', '')" tal:content="alt/title"/>
+                  </tal:alternatives>
+                </select>
+              </td>
+            </tr>
+
+	    <tr tal:define="paramValue parameters/printfont | string:">
+	      <td class="caption" width="33%" i18n:translate="help_courseparam_printfont">Font</td>
+	    <td class="default" colspan="2">
+	      <input type="radio" name="printfont" value="" tal:attributes="checked python:test(paramValue==attrs['value'], 'checked', nothing)" class="noborder"/>
+              Computer Modern
+              <br />
+              <img tal:replace="structure here/parmimages/computer-modern.png"
+                   tal:attributes="alt string:Sample of Computer Modern typeface; title string:Sample of Computer Modern typeface" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="printfont" value="times" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              Times
+              <br />
+              <img tal:replace="structure here/parmimages/times.png"
+                   tal:attributes="alt string:Sample of Times typeface; title string:Sample of Times typeface" />
+	    </td>
+            <td colspan="2">
+              <input type="radio" name="printfont" value="palatino" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              Palatino
+              <br />
+              <img tal:replace="structure here/parmimages/palatino.png"
+                   tal:attributes="alt string:Sample of Palatino typeface; title string:Sample of Palatino typeface" />
+              </td>
+	  </tr>
+          <tr tal:define="paramValue parameters/fontsize | string:">
+            <td class="caption" i18n:translate="help_courseparam_sprodnotate">Font Size</td>
+            <td colspan="3" class="default">
+              <input type="radio" name="fontsize" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+                10pt
+              </td>
+              <td colspan="3">
+                <input type="radio" name="fontsize" value="12pt" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+                  12pt
+                </td>
+              </tr>
+	  <tr tal:define="paramValue parameters/papersize | string:">
+	    <td class="caption" i18n:translate="help_courseparam_sprodnotate">Paper Size</td>
+	    <td colspan="3" class="default">
+	      <input type="radio" name="papersize" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              8.5" x 11"
+	    </td>
+	    <td colspan="3">
+	      <input type="radio" name="papersize" value="6x9" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              6" x 9"
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/paraspacing | string:">
+	    <td class="caption" i18n:translate="help_courseparam_curlnotate">Paragraph Spacing</td>
+	    <td colspan="3" class="default">
+	      <input type="radio" name="paraspacing" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              Compact
+	    </td>
+	    <td colspan="3">
+	      <input type="radio" name="paraspacing" value="loose" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              Loose
+	    </td>
+	  </tr>
+	</table>
+	  <table class="listing parameters" align="center">
+	    <tr class="firstrow">
+	      <th colspan="7" i18n:translate="listingheader_courseparam_calcnotate">Calculus Notation</th>
+	    </tr>
+	    <tr tal:define="paramValue parameters/vectornotation | string:">
+	      <td class="caption" width="33%" i18n:translate="help_courseparam_vectnotate">Vector Notation</td>
+	    <td class="default" colspan="2">
+	      <input type="radio" name="vectornotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'], 'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/vector-1.gif" tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="vectornotation" value="overbar" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/vector-2.gif"
+                   tal:attributes="alt string:Overbar; title string:Overbar" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="vectornotation" value="rightarrow" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/vector-3.gif"
+                   tal:attributes="alt string:Right Arrow; title string:Right Arrow" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/scalarproductnotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_sprodnotate">Scalar Product Notation</td>
+	    <td colspan="3" class="default">
+	      <input type="radio" name="scalarproductnotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/scalar-2.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="3">
+	      <input type="radio" name="scalarproductnotation" value="dotnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/scalar-1.gif"
+                   tal:attributes="alt string:Dot Notation; title string:Dot Notation" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/curlnotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_curlnotate">Curl Notation</td>
+	    <td colspan="3" class="default">
+	      <input type="radio" name="curlnotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/curl-2.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="3">
+	      <input type="radio" name="curlnotation" value="symbolicnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/curl-1.gif"
+                   tal:attributes="alt string:Symbolic Notation; title string:Symbolic Notation" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/gradnotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_gradnotate">Gradient Notation</td>
+	    <td colspan="3" class="default">
+	      <input type="radio" name="gradnotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/grad-2.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="3">
+	      <input type="radio" name="gradnotation" value="symbolicnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/grad-1.gif"
+                   tal:attributes="alt string:Symbolic Notation; title string:Symbolic Notation" />
+	    </td>
+	  </tr>
+	</table>
+
+	<table class="listing parameters" width="100%">
+	  <tr class="firstrow"><th align="center" colspan="5" class="category" i18n:translate="listingheader_param_miscnotate">Miscellaneous Notation</th></tr>
+	  <tr tal:define="paramValue parameters/andornotation | string:">
+	    <td class="caption" width="33%" i18n:translate="help_courseparam_logicnotate">And / Or Notation</td>
+	    <td class="default"><input type="radio" name="andornotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/andor-4.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td>
+	      <input type="radio" name="andornotation" value="text" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/andor-1.gif"
+                   tal:attributes="alt string:Text; title string:Text" />
+	    </td>
+	    <td>
+	      <input type="radio" name="andornotation" value="statlogicnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/andor-2.gif"
+                   tal:attributes="alt string:Stat Logic Notation; title string:Stat Logic Notation" />
+	    </td>
+	    <td>
+	      <input type="radio" name="andornotation" value="dsplogicnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/andor-3.gif"
+                   tal:attributes="alt string:DSP Logic Notation; title string:DSP Logic Notation" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/realimaginarynotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_partnotate">Real / Imaginary Notation</td>
+	    <td class="default" colspan="2">
+	      <input type="radio" name="realimaginarynotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/realim-2.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="realimaginarynotation" value="text" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/realim-1.gif"
+                   tal:attributes="alt string:Text; title string:Text" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/conjugatenotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_conjnotate">Conjugate Notation</td>
+	    <td colspan="2" class="default">
+	      <input type="radio" name="conjugatenotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/conjugate-2.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="conjugatenotation" value="engineeringnotation" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/conjugate-1.gif"
+                   tal:attributes="alt string:Engineering Notation; title string:Engineering Notation" />
+	    </td>
+ 	  </tr>
+	  <tr tal:define="paramValue parameters/imaginaryi | string:">
+	    <td class="caption" i18n:translate="help_courseparam_imagnotate">Imaginary I Notation</td>
+	    <td colspan="2" class="default">
+	      <input type="radio" name="imaginaryi" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/imaginary-1.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="imaginaryi" value="j" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/imaginary-2.gif"
+                   tal:attributes="alt string:j; title string:j" />
+	    </td>
+	  </tr>
+	    
+	    <tr tal:define="paramValue python:str(parameters.get('forallequation', '0'))">
+	      <td class="caption" i18n:translate="help_courseparam_eqnnotate">Equation Layout <sup>1</sup></td>
+	      <td colspan="2" class="default">
+		<input type="radio" name="forallequation:int" value="0" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/equation-1.gif"
+                   tal:attributes="alt string:; title string:" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="forallequation:int" value="1" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/equation-2.gif"
+                   tal:attributes="alt string:; title string:" />
+	    </td>
+	  </tr>             
+	  <tr tal:define="paramValue parameters/meannotation | string:">
+	    <td class="caption" i18n:translate="help_courseparam_meannotate">Mean Notation</td>
+	    <td colspan="2" class="default">
+	      <input type="radio" name="meannotation" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/mean-1.gif"
+                   tal:attributes="alt string:; title string:" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="meannotation" value="anglebracket" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/mean-2.gif"
+                   tal:attributes="alt string:Angle Bracket; title string:Angle Bracket" />
+	    </td>
+	  </tr>
+	  <tr tal:define="paramValue parameters/remainder | string:">
+	    <td class="caption" i18n:translate="help_courseparam_remnotate">Remainder (Modular Division)</td>
+	    <td colspan="2" class="default">
+	      <input type="radio" name="remainder" value="" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/remainder-1.gif"
+                   tal:attributes="alt string:default; title string:default" />
+	    </td>
+	    <td colspan="2">
+	      <input type="radio" name="remainder" value="remainder_anglebrackets" tal:attributes="checked python:test(paramValue==attrs['value'],'checked', nothing)" class="noborder"/>
+              <img tal:replace="structure here/parmimages/remainder-2.gif"
+                   tal:attributes="alt string:Angle Brackets; title string:Angle Brackets" />
+	    </td>
+	  </tr>
+	</table>
+      </tal:block>
+
+
+	<input class="context" type="submit" name="submit" value="Update Properties" i18n:attributes="value value_param_update;"/>
+      </form>
+
+      <p i18n:translate="description_courseparam_eqnexplanation" style="margin-top: 1em;">
+      <sup>1</sup>The two choices are mathematically equivalent, yet
+      are very different in presentation.
+      </p>
+      </div>
+  </body>
+</html>	
+ 
