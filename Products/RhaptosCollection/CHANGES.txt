@@ -1,3 +1,6 @@
+RhaptosCollection-0.71
+  - add declared dependency on colcomplete to colprint queue jobs, for new style PDFs
+
 RhaptosCollection-0.70
   - add 'harvestable' boolean to allow exclusion of collections from OAI
   - add 'size' field to query_ptool diagnostic page
