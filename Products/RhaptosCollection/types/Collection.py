@@ -1038,8 +1038,9 @@ class Collection(CollectionBase, CollaborationManager):
         styles = printtool.getAlternateStyles()
         mystyle = self.getParameters().get('printstyle','')
 
+        depends = []
+
         if mystyle:
-            depends = []
             depkey = 'colcomplete_%s' % self.objectId
             deptype = 'printtool'
             depdetail = {'objectId':self.objectId, 'version':self.version, 'extension':'offline.zip', 'newer':DateTime()}
@@ -1070,6 +1071,7 @@ class Collection(CollectionBase, CollaborationManager):
                         "serverURL":serverURL,
                         "project_name":project_name,
                         "project_short_name":project_short_name}
+
         if depends:
             dictRequest['depends'] = depends
 
