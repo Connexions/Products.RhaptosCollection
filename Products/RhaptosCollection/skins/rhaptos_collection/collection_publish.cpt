@@ -92,6 +92,14 @@
 	  </div>
 
 	  <input type="submit" class="context" name="form.button.publish" value="Publish" tal:attributes="tabindex tabindex/next;" i18n:attributes="value publish" />
+      <input tal:condition="python:here.state=='pending'"
+          type="submit" 
+             class="context" 
+             name="form.button.withdraw" 
+             value="Withdraw" 
+             tal:attributes="tabindex tabindex/next;" 
+             i18n:attributes="value value_collection_withdraw"/>
+
           <input type="hidden" name="form.submitted" value="1" />
 	</form>
 	<p i18n:translate="text_license_allow"
@@ -131,8 +139,7 @@
       <tal:block tal:condition="python: canPublish and not(isPublisher)">
   <div style="border: 2px solid rgb(238, 119, 0); margin: 0.5em 0pt; padding: 0.5em; background-color: rgb(255, 238, 119);">
 	<p i18n:translate="text_coursepub_cantpublish">
-	  <span i18n:name="warning"><strong i18n:translate="text_note">PUBLISH BLOCKED:</strong></span>
-	  You do not have <strong>publishing permissions</strong>	</p>
+	  You do not yet have <strong>publishing permissions.</strong> Your submission will be reviewed to determine if it meets minimum standards for publication.</p>
 </div>
 	  <p><strong i18n:translate="text_coursepub_reminders">Before you submit for publication, did you remember to:</strong></p>
 	  <ul>
