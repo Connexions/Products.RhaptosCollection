@@ -1,3 +1,6 @@
+RhaptosCollection-0.71.1
+  - add admin withdraw button for pending publications of collections
+
 RhaptosCollection-0.71
   - add declared dependency on colcomplete to colprint queue jobs, for new style PDFs
 
