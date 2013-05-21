@@ -1,3 +1,6 @@
+RhaptosCollection-0.71.2
+  - allow public access to a couple create_* methods
+
 RhaptosCollection-0.71.1
   - add admin withdraw button for pending publications of collections
 
