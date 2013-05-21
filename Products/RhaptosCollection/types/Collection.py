@@ -1269,10 +1269,10 @@ class Collection(CollectionBase, CollaborationManager):
                     zipfile.writestr(file_location, bytes)
                     #log("... for module %s in collection %s, writing file %s to zip at %s ..." % (module_id,collection_id,module_file_name,file_location))
 
-    security.declarePrivate('create_collxml')
+    security.declarePublic('create_collxml')
     def create_collxml(self, REQUEST=None, collectionXml=None, versionHistoryXml=None, ancillaryXml=None):
         """
-        does the heavy lifting for building the collection zip.
+        returns a zipfile with just the collxml inside
         """
         collection = self
         collection_name = collection.getTitle()
@@ -1296,7 +1296,7 @@ class Collection(CollectionBase, CollaborationManager):
         data = content.getvalue()
         return data
 
-    security.declarePrivate('create_complete')
+    security.declarePublic('create_complete')
     def create_complete(self, REQUEST=None, collectionXml=None, versionHistoryXml=None, ancillaryXml=None):
         """
         does the heavy lifting for building the collection zip.
