@@ -18,8 +18,9 @@
                                             license_data here/getLicenseData;
                                             license_version license_data/version;
                                             license_label license_data/label;
+                                            license_name license_data/name;
                                             license_url context/license;
-                                            default_license context/getDefaultLicense;
+                                            default_license context/getDefaultLicense(license_data/code);
                                             default_license_data python:context.getLicenseData(default_license);
                                             default_license_version default_license_data/version;
                                             default_license_label default_license_data/label;
@@ -32,7 +33,7 @@
       <h2 i18n:translate="heading_publish_collection">Publish collection</h2>
 
     <tal:license tal:condition="needLicenseUpgrade"  tal:define="status string:license; newCollectionTitle python:'License agreement';
-     message python:'The publication license agreement has changed since you last agreed to it.  The previous license on this content was the Creative Commons %(name)s License, Version %(version)s. You will need to accept the new license prior to publishing.' % license_data"> 
+     message python:'The publication license agreement has changed since you last agreed to it.  The previous license on this content was the %(name)s, Version %(version)s. You will need to accept the new license prior to publishing.' % license_data"> 
     <div class="portalMessage" tal:content="message">Upgrade</div>
         <div metal:use-macro="container/cc_license/macros/license" />
     </tal:license>
@@ -103,11 +104,11 @@
           <input type="hidden" name="form.submitted" value="1" />
 	</form>
 	<p i18n:translate="text_license_allow"
-           style="margin-top: 1em;">This work will now be distributed under the terms of the Creative Commons Attribution License
-          <span i18n:name="license_name">
+           style="margin-top: 1em;">This work will now be distributed under the terms of the 
+          <span i18n:name="license_name" tal:content="license_name">Creative Commons Attribution License
+          </span> 
             (<span i18n:translate=""
                   tal:content="license_label">[(CC-BY 3.0)]</span>)
-          </span> 
         available at 
         <a style="font-style: italic"
           tal:attributes="href license_url"
@@ -186,11 +187,11 @@
           <input type="hidden" name="form.submitted" value="1" />
 	</form>
 	<p i18n:translate="text_license_allow"
-           style="margin-top: 1em;">This work will now be distributed under the terms of the Creative Commons Attribution License
-          <span i18n:name="license_name">
+           style="margin-top: 1em;">This work will now be distributed under the terms of the
+          <span i18n:name="license_name" tal:content="license_name">Creative Commons Attribution License
+          </span> 
             (<span i18n:translate=""
                   tal:content="license_label">[(CC-BY 3.0)]</span>)
-          </span> 
         available at 
         <a style="font-style: italic"
           tal:attributes="href license_url"
