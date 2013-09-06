@@ -13,8 +13,14 @@
   i18n by cbearden@rice.edu
 </tal:comment>
   <!-- Course Object -->
-  <rdf:Description about="urn:context:root">
-    <cc:license tal:attributes="rdf:resource here/license" />
+  <rdf:Description about="urn:context:root" tal:define="license_data here/getLicenseData;
+                                                        license_name license_data/name;
+                                                        license_version license_data/version;
+                                                        license_code license_data/code">
+    <cc:license tal:attributes="rdf:resource here/license;
+                                name license_name;
+                                version license_version;
+                                code license_code"/>
     <cnx:class>context</cnx:class>
     <cnx:type>Course</cnx:type>
     <cnx:name tal:content="here/Title">Title</cnx:name>
