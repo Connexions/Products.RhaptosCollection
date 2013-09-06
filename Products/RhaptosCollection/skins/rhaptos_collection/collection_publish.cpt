@@ -20,7 +20,7 @@
                                             license_label license_data/label;
                                             license_name license_data/name;
                                             license_url context/license;
-                                            default_license context/getDefaultLicense(license_data/code);
+                                            default_license context.getDefaultLicense(license_data['code']);
                                             default_license_data python:context.getLicenseData(default_license);
                                             default_license_version default_license_data/version;
                                             default_license_label default_license_data/label;
