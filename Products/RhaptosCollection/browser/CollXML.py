@@ -19,7 +19,8 @@ def annotateContents(col, repos, contents):
         eltid = elt.get('id', None)  # indicates pub module ref only
         obpath = elt.get('path', None)
         if not container and eltid:
-            elt['reposversion'] = repos.getHistory(eltid)[0].version
+            revdate = col.revised
+            elt['reposversion'] = [h.version for h in repos.getHistory(eltid) if h.revised < revdate][0]
             #alternately repos.getRhaptosObject(eltid, 'latest').version
 
             links = col.restrictedTraverse(obpath).getLinks(sequence=0)
