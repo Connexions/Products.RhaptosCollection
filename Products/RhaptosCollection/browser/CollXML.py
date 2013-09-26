@@ -20,9 +20,13 @@ def annotateContents(col, repos, contents):
         obpath = elt.get('path', None)
         if not container and eltid:
             revdate = col.revised
-            elt['reposversion'] = [h.version for h in repos.getHistory(eltid) if h.revised < revdate][0]
-            #alternately repos.getRhaptosObject(eltid, 'latest').version
-
+            hist = repos.getHistory(eltid)
+            trimmed_hist = [h for h in hist if h.revised <= revdate]
+            if trimmed_hist:
+                elt['reposversion'] = trimmed_hist[0].version
+            else: # screwy dates in old data: assume it's the first
+                elt['reposversion'] = hist[0].version
+                
             links = col.restrictedTraverse(obpath).getLinks(sequence=0)
             linkgroups = {}
             for l in links:
