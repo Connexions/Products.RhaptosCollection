@@ -19,9 +19,14 @@ def annotateContents(col, repos, contents):
         eltid = elt.get('id', None)  # indicates pub module ref only
         obpath = elt.get('path', None)
         if not container and eltid:
-            elt['reposversion'] = repos.getHistory(eltid)[0].version
-            #alternately repos.getRhaptosObject(eltid, 'latest').version
-
+            revdate = col.revised
+            hist = repos.getHistory(eltid)
+            trimmed_hist = [h for h in hist if h.revised <= revdate]
+            if trimmed_hist:
+                elt['reposversion'] = trimmed_hist[0].version
+            else: # screwy dates in old data: assume it's the first
+                elt['reposversion'] = hist[0].version
+                
             links = col.restrictedTraverse(obpath).getLinks(sequence=0)
             linkgroups = {}
             for l in links:
