@@ -1,3 +1,6 @@
+RhaptosCollection-0.73.1
+  - add 4.0 CC license
+
 RhaptosCollection-0.73
   - correct collxml generation for non-latest versions
 
