@@ -68,13 +68,13 @@ class FeaturedLinksView(ComposerBaseView):
 
             elif urlorid == 'id':
                 if not connexions_id:
-                    errors['connexions_id'] = _("Please enter a Connexions ID")
+                    errors['connexions_id'] = _("Please enter an OpenStax CNX ID")
                 else:
                     # Does target exist?
                     try:
                         target = context.content.getRhaptosObject(connexions_id, version).url()
                     except KeyError:
-                        errors['connexions_id'] = _("Please enter a valid Connexions ID and optional version")
+                        errors['connexions_id'] = _("Please enter a valid OpenStax CNX ID and optional version")
 
             if errors:
                 if action == 'create':

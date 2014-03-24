@@ -1058,8 +1058,8 @@ class Collection(CollectionBase, CollaborationManager):
 
         project_name = portal.Title()
         project_short_name = project_name
-        if project_name == 'Connexions':
-              project_name = 'The Connexions Project'
+        if project_name == 'OpenStax CNX':
+              project_name = 'The OpenStax CNX Project'
 
         qtool = getToolByName(self, 'queue_tool')
         key = "colprint_%s" % self.objectId
