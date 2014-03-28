@@ -1,3 +1,6 @@
+RhaptosCollection-0.73.2
+  - Rename Connexions to OSCNX
+
 RhaptosCollection-0.73.1
   - add 4.0 CC license
 
