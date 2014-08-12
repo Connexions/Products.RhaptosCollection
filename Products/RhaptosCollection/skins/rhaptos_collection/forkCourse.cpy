@@ -67,11 +67,5 @@ for o in new_context.objectValues():
 if hasattr(new_context, 'GoogleAnalyticsTrackingCode'):
     new_context.setGoogleAnalyticsTrackingCode(None)
 
-# delete custom printstyle if it's a ccap style
-p = new_context.parameters
-ps = p.getProperty('printstyle')
-if ps and ps.startswith('ccap-'):
-    p.manage_delProperties(['printstyle'])
-
 psm = context.translate("message_item_created", domain="rhaptos", default="Item created.")
 return state.set(context=new_context, portal_status_message=psm)
