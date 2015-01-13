@@ -1,3 +1,6 @@
+RhaptosCollection-0.74
+  - allow derived copies to have OSC book styles
+
 RhaptosCollection-0.73.2
   - Rename Connexions to OSCNX
 
