@@ -1043,7 +1043,7 @@ class Collection(CollectionBase, CollaborationManager):
         if mystyle:
             depkey = 'colcomplete_%s' % self.objectId
             deptype = 'printtool'
-            depdetail = {'objectId':self.objectId, 'version':self.version, 'extension':'offline.zip', 'newer':DateTime()}
+            depdetail = {'objectId':self.objectId, 'version':self.version, 'extension':'complete.zip', 'newer':DateTime()}
             depaction = 'reenqueue' 
 
             depends.append((depkey,deptype,depaction,depdetail))
