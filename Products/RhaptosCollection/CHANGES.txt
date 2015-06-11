@@ -1,3 +1,6 @@
+RhaptosCollection-0.75
+  - new style PDF depends on completezip, not offlinezip
+
 RhaptosCollection-0.74
   - allow derived copies to have OSC book styles
 
