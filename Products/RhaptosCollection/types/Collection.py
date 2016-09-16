@@ -572,6 +572,20 @@ class Collection(CollectionBase, CollaborationManager):
         #log("Setting courseURL cookie to\n\t%s\nwith context\n\ts%s" % (self.url(),cookie_context))
         self.REQUEST.RESPONSE.setCookie('courseURL', self.url(), path=cookie_context)
 
+        #Check if we're latest
+        if self.id == 'latest':
+            versionFolder = self.aq_parent
+            db_history = self.portal_moduledb.sqlGetHistory(id=versionFolder.id).dictionaries()
+            if db_history[0]['version'] != self.version:
+                latest = moduledb_tool.sqlGetModule(id=versionFolder.id,
+                                                    version=db_history[0]['version']
+                                                    ).dictionaries()
+
+                for item in db_history:
+                    versionFolder[item['version']]  # Triggers db lookup and creation
+                self.edit(latest['name'], latest['version'])
+                self.catalog.catalog_object(vf.latest)
+
         # If they ask for it as RDF, give to them
         format = self.REQUEST.get('format', None)
         if format == 'rdf':
