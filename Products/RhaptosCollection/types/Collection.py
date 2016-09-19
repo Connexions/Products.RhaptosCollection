@@ -8,7 +8,7 @@ This software is subject to the provisions of the GNU Lesser General
 Public License Version 2.1 (LGPL).  See LICENSE.txt for details.
 """
 
-import httplib, urllib, socket
+import httplib, urllib, socket, sys
 from httplib import InvalidURL
 
 from webdav.Lockable import ResourceLockedError
@@ -571,6 +571,22 @@ class Collection(CollectionBase, CollaborationManager):
         cookie_context = "/%s" % portal.content.virtual_url_path()
         #log("Setting courseURL cookie to\n\t%s\nwith context\n\ts%s" % (self.url(),cookie_context))
         self.REQUEST.RESPONSE.setCookie('courseURL', self.url(), path=cookie_context)
+
+        #Check if we're latest - very crufty way to detect References ('latest') object
+        caller = sys._getframe().f_back.f_back.f_code.co_name
+        if caller == '__call':  # On a direct version access ('1.6') this is 'call_object'
+            versionFolder = self.aq_parent
+            db_history = self.portal_moduledb.sqlGetHistory(id=versionFolder.id).dictionaries()
+            if db_history[0]['version'] != self.version:
+                latest = self.portal_moduledb.sqlGetModule(id=versionFolder.id,
+                                                    version=db_history[0]['version']
+                                                    ).dictionaries()[0]
+
+                for item in db_history:
+                    versionFolder[item['version']]  # Triggers db lookup and creation
+                versionFolder.latest.edit(latest['name'], latest['version'])
+                self.catalog.catalog_object(versionFolder.latest)
+                self.REQUEST.RESPONSE.redirect(versionFolder.url(), status=301)
 
         # If they ask for it as RDF, give to them
         format = self.REQUEST.get('format', None)
