@@ -1,3 +1,6 @@
+RhaptosCollection-0.76
+  - check for new db version when latest collection is accessed
+
 RhaptosCollection-0.75
   - new style PDF depends on completezip, not offlinezip
 
