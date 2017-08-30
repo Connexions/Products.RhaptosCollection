@@ -1278,6 +1278,10 @@ class Collection(CollectionBase, CollaborationManager):
                         continue
                     if module_file == 'CVS':
                         continue
+                    if module_file == 'index_auto_generated.cnxml':
+                        # this is already included in the "Handle CNXML version
+                        # upgrade/metadata extension" code above
+                        continue
 
                     module_file_name = module_file
                     bytes = str(module.getFile(module_file_name))
