@@ -1,3 +1,6 @@
+RhaptosCollection-0.77
+  - Fix collection complete zip duplicate filename
+
 RhaptosCollection-0.76
   - check for new db version when latest collection is accessed
 
