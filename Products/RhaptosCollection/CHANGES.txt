@@ -1,3 +1,6 @@
+RhaptosCollection-0.78
+  - disallow empty chapters and duplicate chapter names for collections (#11)
+
 RhaptosCollection-0.77
   - Fix collection complete zip duplicate filename
 
