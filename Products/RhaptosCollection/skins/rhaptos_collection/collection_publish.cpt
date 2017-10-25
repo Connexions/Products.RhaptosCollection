@@ -15,6 +15,9 @@
   <body>
 
     <div metal:fill-slot="main" tal:define="errors options/state/getErrors;
+                                            versioninfo context/rmeVersionInfo;
+                                            publishBlocked python:context.publishBlocked(versioninfo);
+
                                             license_data here/getLicenseData;
                                             license_version license_data/version;
                                             license_label license_data/label;
@@ -25,6 +28,7 @@
                                             default_license_version default_license_data/version;
                                             default_license_label default_license_data/label;
                                             needLicenseUpgrade python:test(license_url!=default_license);
+
                                             isPublisher here/isPublisher;
                                             canPublish here/canPublish;
 ">
@@ -32,6 +36,9 @@
 
       <h2 i18n:translate="heading_publish_collection">Publish collection</h2>
 
+      <tal:block metal:use-macro="here/unpublishable/macros/publishblocker" />
+
+    <tal:block tal:condition="not:publishBlocked">
     <tal:license tal:condition="needLicenseUpgrade"  tal:define="status string:license; newCollectionTitle python:'License agreement';
      message python:'The publication license agreement has changed since you last agreed to it.  The previous license on this content was the %(name)s, Version %(version)s. You will need to accept the new license prior to publishing.' % license_data"> 
     <div class="portalMessage" tal:content="message">Upgrade</div>
@@ -220,6 +227,7 @@
 		</ol>
 	</tal:block>
 	</tal:gotlicense>
+    </tal:block>
 
     </div>
   </body>
