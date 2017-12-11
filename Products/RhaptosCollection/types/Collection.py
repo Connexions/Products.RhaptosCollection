@@ -1126,11 +1126,10 @@ class Collection(CollectionBase, CollaborationManager):
 
         # ...complete collxml package generation
         if rebuildCompleteZip:
-            if status != 'locked':
-                key = "colcomplete_%s" % self.objectId
-                dictRequest = {'id':oid, 'version':ver, 'repository':repos, 'serverURL':self.REQUEST['SERVER_URL']}
-                qtool.add(key, dictRequest, "%s/create_collection_complete_export_zip.zctl" % script_location)
-                added.append('colcomplete')
+            key = "colcomplete_%s" % self.objectId
+            dictRequest = {'id':oid, 'version':ver, 'repository':repos, 'serverURL':self.REQUEST['SERVER_URL']}
+            qtool.add(key, dictRequest, "%s/create_collection_complete_export_zip.zctl" % script_location)
+            added.append('colcomplete')
 
         # ...pdf and latex generation
         if rebuildCollectionPDF:
