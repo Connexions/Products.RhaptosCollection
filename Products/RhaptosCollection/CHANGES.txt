@@ -1,3 +1,6 @@
+RhaptosCollection-0.79
+  - Build zips even if collection is locked
+
 RhaptosCollection-0.78
   - disallow empty chapters and duplicate chapter names for collections (#11)
 
