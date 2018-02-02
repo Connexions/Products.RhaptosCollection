@@ -17,6 +17,7 @@
     <div metal:fill-slot="main" tal:define="errors options/state/getErrors;
                                             versioninfo context/rmeVersionInfo;
                                             publishBlocked python:context.publishBlocked(versioninfo);
+                                            publisherror publishBlocked/failtype | nothing;
 
                                             license_data here/getLicenseData;
                                             license_version license_data/version;
@@ -38,7 +39,7 @@
 
       <tal:block metal:use-macro="here/unpublishable/macros/publishblocker" />
 
-    <tal:block tal:condition="not:publishBlocked">
+    <tal:block tal:condition="python: not(publishBlocked) or publisherror=='notpub'">
     <tal:license tal:condition="needLicenseUpgrade"  tal:define="status string:license; newCollectionTitle python:'License agreement';
      message python:'The publication license agreement has changed since you last agreed to it.  The previous license on this content was the %(name)s, Version %(version)s. You will need to accept the new license prior to publishing.' % license_data"> 
     <div class="portalMessage" tal:content="message">Upgrade</div>
