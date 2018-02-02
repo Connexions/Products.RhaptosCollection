@@ -1,3 +1,6 @@
+RhaptosCollection-0.80
+  - Don't hide submit button when user is not Publisher
+
 RhaptosCollection-0.79
   - Build zips even if collection is locked
 
