@@ -72,7 +72,7 @@ import mimetypes
 from Products.MimetypesRegistry.MimeTypeItem import ICONS_DIR
 
 from Products.validation.config import validation
-from Products.validation.validators.ExpressionValidator import ExpressionValidator
+from Products.validation.validators.RegexValidator import RegexValidator
 
 # these should really go somewhere else...
 def getLanguageWithSubtypes(self,lang,*args,**kwargs):
@@ -295,9 +295,9 @@ schema = schema +  Schema((
                  ),
     StringField('GoogleAnalyticsTrackingCode',
                 searchable=1,
-                validators=(ExpressionValidator(expression="python:len(value.split('-')) == 3 and value.split('-')[0] == 'UA' and value.split('-')[1].isdigit() and value.split('-')[2].isdigit()",errormsg="Expecting a tracking code like 'UA-1234567-1'"),),
+                validators=(RegexValidator(r'^UA-[0-9]+-[0-9]+( UA-[0-9]+-[0-9]+)*\s*$', errormsg="Expecting one or more space separated tracking codes like 'UA-1234567-1'"), ),
                 widget=CompactStringWidget(label="Google Analytics Tracking Code",
-                                           description='Enter the Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.<br/><em>Note that this code will track only the collection home page, not the modules therein.</em> <a href="/help/reference/GoogleAnalyticsTrackingCode">(help)</a>' ,
+                                           description='Enter the Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.<br/><a href="/help/reference/GoogleAnalyticsTrackingCode">(help)</a>' ,
                                            i18n_domain="rhaptos"),
                 ),
     ))
