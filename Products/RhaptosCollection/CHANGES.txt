@@ -1,3 +1,6 @@
+RhaptosCollection-0.81
+  - Allow multiple GA codes
+
 RhaptosCollection-0.80
   - Don't hide submit button when user is not Publisher
 
