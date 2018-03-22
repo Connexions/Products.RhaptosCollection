@@ -295,7 +295,7 @@ schema = schema +  Schema((
                  ),
     StringField('GoogleAnalyticsTrackingCode',
                 searchable=1,
-                validators=(RegexValidator(r'^UA-[0-9]+-[0-9]+( UA-[0-9]+-[0-9]+)*\s*$', errormsg="Expecting one or more space separated tracking codes like 'UA-1234567-1'"), ),
+                validators=(RegexValidator('Google Analytics Codes', r'^UA-\d+-\d+( UA-\d+-\d+)*\s*$', errmsg="Expecting one or more space separated tracking codes like 'UA-1234567-1'"), ),
                 widget=CompactStringWidget(label="Google Analytics Tracking Code",
                                            description='Enter the Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.<br/><a href="/help/reference/GoogleAnalyticsTrackingCode">(help)</a>' ,
                                            i18n_domain="rhaptos"),
