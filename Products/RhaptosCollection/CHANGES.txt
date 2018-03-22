@@ -1,3 +1,6 @@
+RhaptosCollection-0.81.1
+  - bugfix for GA codes
+
 RhaptosCollection-0.81
   - Allow multiple GA codes
 
