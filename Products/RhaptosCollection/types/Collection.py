@@ -582,8 +582,7 @@ class Collection(CollectionBase, CollaborationManager):
                                                     version=db_history[0]['version']
                                                     ).dictionaries()[0]
 
-                for item in db_history:
-                    versionFolder[item['version']]  # Triggers db lookup and creation
+                versionFolder[latest['version']]  # Triggers db lookup and creation
                 versionFolder.latest.edit(latest['name'], latest['version'])
                 self.catalog.catalog_object(versionFolder.latest)
                 self.REQUEST.RESPONSE.redirect(versionFolder.url(), status=301)
