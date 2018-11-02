@@ -8,13 +8,13 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       metal:use-macro="container/module_template/macros/master"
       i18n:domain="rhaptos">
-      
+
 	<tal:comment>
 	i18n by: mhutch
 	</tal:comment>
-  
+
   <body>
-    
+
     <style metal:fill-slot="css_slot" type="text/css">
       table td.default {
         background: transparent;
@@ -54,11 +54,17 @@
 
       <p i18n:translate="description_courseparam_instrs">
 	  Please select display parameters for your course.  The
-	  defaults are in the first column of each row<!--shown with a yellow background-->.
+	  defaults are in the first column of each row.
 	</p>
-      
+  <p>LaTeX is a generic style incompatible with most math-heavy content. For math-heavy content,
+    select the style for a math text, such as Developmental Mathematics.</p>
+    <p>“CCAP” refers to PDF styles created for the original OpenStax library, published between
+      2012 and 2018. Styles “with recipe” have numbering and structural transformations in the web
+      view to match the accompanying PDF. Note that all “CCAP” and “with recipe” styles work best with
+      OpenStax books or derived OpenStax books. Results will vary on other content.</p>
+
 	<form method="post" action="updateParameters">
-      
+
 	<tal:block tal:define="parameters here/getParameters">
 	  <table class="listing parameters" align="center" id="fonts">
 	    <tr class="firstrow">
@@ -260,7 +266,7 @@
                    tal:attributes="alt string:j; title string:j" />
 	    </td>
 	  </tr>
-	    
+
 	    <tr tal:define="paramValue python:str(parameters.get('forallequation', '0'))">
 	      <td class="caption" i18n:translate="help_courseparam_eqnnotate">Equation Layout <sup>1</sup></td>
 	      <td colspan="2" class="default">
@@ -273,7 +279,7 @@
               <img tal:replace="structure here/parmimages/equation-2.gif"
                    tal:attributes="alt string:; title string:" />
 	    </td>
-	  </tr>             
+	  </tr>
 	  <tr tal:define="paramValue parameters/meannotation | string:">
 	    <td class="caption" i18n:translate="help_courseparam_meannotate">Mean Notation</td>
 	    <td colspan="2" class="default">
@@ -313,5 +319,4 @@
       </p>
       </div>
   </body>
-</html>	
- 
+</html>
