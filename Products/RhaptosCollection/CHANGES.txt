@@ -1,3 +1,6 @@
+RhaptosCollection-0.83
+  - added text explanation of print styles
+
 RhaptosCollection-0.82
   - Only create latest when db has newer version, no complete history
 
