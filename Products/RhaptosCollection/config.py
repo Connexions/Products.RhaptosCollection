@@ -21,6 +21,7 @@ GLOBALS = globals()
 WORKSPACE_TYPES = ("Workgroup", "Workspace")
 
 LICENSES = DisplayList((
+    ('http://creativecommons.org/licenses/by-nc-sa/4.0/', 'Creative Commons Attribution-NonCommercial-ShareAlike License 4.0'),
     ('http://creativecommons.org/licenses/by/4.0/', 'Creative Commons Attribution 4.0'),
     ('http://creativecommons.org/licenses/by/3.0/', 'Creative Commons Attribution 3.0'),
     ('http://creativecommons.org/licenses/by/2.0/', 'Creative Commons Attribution 2.0'),
